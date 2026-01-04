@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GridScope | v1.0.0 Beta</title>
+    
+    <!-- Professional Logo Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M12 2L20 7V17L12 22L4 17V7L12 2Z' stroke='%238b5cf6' stroke-width='2' stroke-linejoin='round'/%3E%3Crect x='8' y='8' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3Crect x='13' y='8' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3Crect x='8' y='13' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3Crect x='13' y='13' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3C/svg%3E">
+
+    <!-- Essential Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-dark: #2e1065;
+            --brand-primary: #8b5cf6;
+            --bg-main: #09090b;
+            --bg-sidebar: #121214;
+            --border-color: #27272a;
+            --hud-scale: 1.0;
+        }
+
+        body { 
+            background-color: var(--bg-main); 
+            color: #e4e4e7; 
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+        .sidebar { width: 360px; border-right: 1px solid var(--border-color); background: var(--bg-sidebar); z-index: 20; }
+        .control-group { background: #18181b; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .section-label { font-size: 10px; font-weight: 800; color: #52525b; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+        .input-field { background: #09090b; border: 1px solid var(--border-color); color: #fafafa; font-size: 12px; padding: 5px 8px; border-radius: 4px; width: 100%; outline: none; transition: all 0.2s ease; }
+        .input-field:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.4); }
+
+        .btn-step { background: #09090b; border: 1px solid var(--border-color); color: #71717a; padding: 2px 6px; font-size: 10px; border-radius: 3px; transition: all 0.2s; cursor: pointer; }
+        .btn-step:hover { background: #27272a; color: var(--brand-primary); border-color: var(--brand-primary); }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 100%); 
+            color: white; 
+            font-weight: 600; font-size: 12px; padding: 8px; border-radius: 4px; 
+            border: 1px solid var(--brand-primary);
+            transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; 
+        }
+        .btn-primary:hover { filter: brightness(1.2); transform: translateY(-1px); }
+
+        .btn-secondary { background: #27272a; color: #e4e4e7; font-weight: 500; font-size: 11px; padding: 6px; border-radius: 4px; border: 1px solid #3f3f46; transition: all 0.2s; cursor: pointer; }
+        .btn-secondary:hover { background: #3f3f46; }
+
+        #viewport-container { margin: auto; position: relative; background: #000; border-radius: 4px; overflow: hidden; width: 100%; height: 100%; transition: width 0.3s ease, height 0.3s ease; }
+        .mol-container { width: 100%; height: 100%; position: relative; min-height: 400px; }
+        
+        #hud-stats {
+            position: absolute; bottom: 8px; left: 8px;
+            background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(12px);
+            border: 1px solid var(--brand-primary); border-radius: 4px;
+            padding: calc(10px * var(--hud-scale)) calc(14px * var(--hud-scale)); 
+            pointer-events: auto; user-select: none; cursor: grab;
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: calc(10px * var(--hud-scale)); 
+            color: #e4e4e7;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            z-index: 10;
+            width: auto;
+            min-width: calc(200px * var(--hud-scale));
+        }
+        .hud-row { display: flex; justify-content: space-between; gap: calc(24px * var(--hud-scale)); border-bottom: 1px solid rgba(255,255,255,0.05); padding: calc(4px * var(--hud-scale)) 0; }
+        .hud-row:last-child { border: none; }
+        .hud-label { color: #8b5cf6; font-weight: 700; letter-spacing: 0.05em; font-size: calc(9px * var(--hud-scale)); }
+        .hud-val { color: #fff; font-weight: 500; }
+
+        .accent-slider { accent-color: var(--brand-primary); width: 100%; height: 4px; border-radius: 2px; background: #27272a; cursor: pointer; }
+        .custom-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; padding-right: 28px; }
+        
+        .overlay-base { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(12px); background: rgba(9, 9, 11, 0.9); }
+        #confirmation-modal { background: #18181b; border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; width: 340px; text-align: center; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden select-none">
+
+    <div id="wipe-modal" class="overlay-base">
+        <div id="confirmation-modal">
+            <h3 class="text-white font-bold text-lg mb-1">Reset Session</h3>
+            <p class="text-zinc-400 text-xs mb-6 px-4">This will clear all structural data and reset the grid geometry. Continue?</p>
+            <div class="flex gap-2">
+                <button id="cancel-wipe" class="flex-1 btn-secondary">Cancel</button>
+                <button id="confirm-wipe" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded py-2 transition-colors">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <nav class="h-12 bg-black border-b border-[#27272a] flex items-center px-6 justify-between z-30 shadow-2xl">
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_0_8px_rgba(139,92,246,0.6)]">
+                    <path d="M12 2L20 7V17L12 22L4 17V7L12 2Z" stroke="#8b5cf6" stroke-width="2" stroke-linejoin="round"/>
+                    <rect x="8" y="8" width="3" height="3" rx="0.5" fill="#8b5cf6" class="animate-pulse"/>
+                    <rect x="13" y="8" width="3" height="3" rx="0.5" fill="#8b5cf6"/>
+                    <rect x="8" y="13" width="3" height="3" rx="0.5" fill="#8b5cf6"/>
+                    <rect x="13" y="13" width="3" height="3" rx="0.5" fill="#8b5cf6" class="animate-pulse" style="animation-delay: 0.5s"/>
+                </svg>
+                <div class="font-bold tracking-tighter text-white text-base uppercase font-sans">Grid<span class="text-[#8b5cf6] font-medium">Scope</span></div>
+            </div>
+            <div class="h-4 w-[1px] bg-zinc-800"></div>
+            <div id="file-status" class="text-zinc-500 font-medium text-[10px] uppercase tracking-[0.2em]">Geometry Engine Active</div>
+        </div>
+        <div class="px-2 py-1 bg-[#2e1065] border border-[#8b5cf6]/50 rounded text-[9px] text-[#8b5cf6] font-mono tracking-tighter uppercase font-bold shadow-[0_0_10px_rgba(139,92,246,0.2)]">v1.0.0 BETA</div>
+    </nav>
+
+    <div class="flex flex-1 overflow-hidden">
+        <aside class="sidebar flex flex-col overflow-y-auto p-5 custom-scrollbar">
+            
+            <div class="section-label">Structure Engine</div>
+            <div class="control-group">
+                <div class="space-y-2.5">
+                    <label class="group block cursor-pointer">
+                        <input type="file" id="pdb-upload" accept=".pdb" class="hidden">
+                        <div class="flex items-center justify-between p-2.5 rounded bg-zinc-900 border border-zinc-800 hover:border-[#8b5cf6] transition-all">
+                            <div class="flex flex-col">
+                                <span class="text-[9px] text-zinc-600 uppercase font-extrabold">Receptor PDB</span>
+                                <span id="protein-name" class="text-[11px] text-zinc-300 truncate max-w-[180px]">Select File</span>
+                            </div>
+                            <svg class="w-4 h-4 text-zinc-700 group-hover:text-[#8b5cf6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="section-label">Grid Engineering (Å)</div>
+            <div class="control-group">
+                <!-- Manual Coordinates with Steppers -->
+                <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Center X</span>
+                        <input type="number" id="cx" value="0.0" step="0.1" class="input-field mono text-center py-1">
+                        <div class="flex gap-1">
+                            <button onclick="stepCoord('cx', -0.1)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('cx', 0.1)" class="btn-step flex-1">+</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Center Y</span>
+                        <input type="number" id="cy" value="0.0" step="0.1" class="input-field mono text-center py-1">
+                        <div class="flex gap-1">
+                            <button onclick="stepCoord('cy', -0.1)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('cy', 0.1)" class="btn-step flex-1">+</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Center Z</span>
+                        <input type="number" id="cz" value="0.0" step="0.1" class="input-field mono text-center py-1">
+                        <div class="flex gap-1">
+                            <button onclick="stepCoord('cz', -0.1)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('cz', 0.1)" class="btn-step flex-1">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Width</span>
+                        <input type="number" id="sx" value="20.0" step="1" class="input-field mono text-center py-1">
+                        <div class="flex gap-1">
+                            <button onclick="stepCoord('sx', -0.1)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('sx', 0.1)" class="btn-step flex-1">+</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Height</span>
+                        <input type="number" id="sy" value="20.0" step="1" class="input-field mono text-center py-1">
+                        <div class="flex gap-1">
+                            <button onclick="stepCoord('sy', -0.1)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('sy', 0.1)" class="btn-step flex-1">+</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Depth</span>
+                        <input type="number" id="sz" value="20.0" step="1" class="input-field mono text-center py-1">
+                        <div class="flex gap-1">
+                            <button onclick="stepCoord('sz', -0.1)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('sz', 0.1)" class="btn-step flex-1">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blind Docking Subsection -->
+                <div class="border-t border-zinc-800 pt-3 mb-3">
+                    <div class="text-[9px] font-extrabold text-zinc-500 uppercase mb-2 tracking-wider">Blind Docking</div>
+                    <div class="flex gap-2 items-end">
+                         <div class="flex flex-col gap-1 w-1/3">
+                            <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Padding</span>
+                            <input type="number" id="blind-padding" value="5.0" step="1.0" class="input-field mono text-center py-1.5 text-[#8b5cf6] font-bold">
+                        </div>
+                        <button id="btn-blind-dock" class="btn-secondary flex-1 text-[9px] uppercase font-bold py-2 mb-[1px]">Auto-Fit to Protein</button>
+                    </div>
+                </div>
+
+                <button id="align-protein" class="btn-secondary w-full uppercase font-bold text-[9px] py-2 mt-1">Reset Viewport</button>
+            </div>
+
+            <div class="section-label">Studio Settings</div>
+            <div class="control-group space-y-4">
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[9px] text-zinc-600 uppercase font-extrabold">Base Style</label>
+                        <select id="repr" class="input-field custom-select py-1.5">
+                            <option value="cartoon" selected>Cartoon</option>
+                            <option value="stick">Stick</option>
+                            <option value="line">Line</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                         <label class="text-[9px] text-zinc-600 uppercase font-extrabold">Coloring</label>
+                         <select id="color-scheme" class="input-field custom-select py-1.5">
+                             <option value="spectrum" selected>Rainbow</option>
+                             <option value="chain">Chain ID</option>
+                             <option value="hydro">Hydrophobicity</option>
+                             <option value="element">Element</option>
+                         </select>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between border-t border-zinc-800 pt-3">
+                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold text-[#8b5cf6]">Orthographic Cam</label>
+                    <input type="checkbox" id="ortho-check" class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
+                </div>
+                <div class="flex flex-col gap-1.5 border-t border-zinc-800 pt-3">
+                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold">Background</label>
+                    <select id="bg-mode" class="input-field custom-select py-1.5">
+                        <option value="black" selected>Solid Black</option>
+                        <option value="white">Laboratory White</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-label">Visual Fidelity</div>
+            <div class="control-group space-y-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold">Primary Tint</label>
+                    <select id="grid-color" class="input-field custom-select py-1.5">
+                        <option value="#8b5cf6" selected>Hologram Violet</option>
+                        <option value="#06b6d4">Cyber Cyan</option>
+                        <option value="#10b981">Matrix Green</option>
+                        <option value="#f43f5e">Alert Red</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-between border-b border-zinc-800/50 pb-3">
+                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold text-[#8b5cf6]">Show Data Overlay</label>
+                    <input type="checkbox" id="hud-toggle-check" checked class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
+                </div>
+                <div id="hud-controls" class="space-y-2">
+                    <div class="flex justify-between text-[10px] text-zinc-500 font-bold uppercase"><span>HUD Scale</span><span id="hud-scale-val" class="text-[#8b5cf6] font-mono">1.0x</span></div>
+                    <input type="range" id="hud-scale" min="0.6" max="1.4" step="0.1" value="1.0" class="accent-slider">
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-[10px] text-zinc-500 font-bold uppercase"><span>Glow Intensity</span><span id="opacity-val" class="text-[#8b5cf6] font-mono">0.12</span></div>
+                    <input type="range" id="grid-opacity" min="0" max="0.5" step="0.01" value="0.12" class="accent-slider">
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-[10px] text-zinc-500 font-bold uppercase"><span>Cage Thickness</span><span id="thickness-val" class="text-[#8b5cf6] font-mono">0.30 Å</span></div>
+                    <input type="range" id="grid-thickness" min="0.05" max="1.0" step="0.05" value="0.30" class="accent-slider">
+                </div>
+                <div class="flex items-center justify-between border-t border-zinc-800 pt-3">
+                    <span class="text-[9px] text-zinc-500 font-bold uppercase">Axis Crosshairs</span>
+                    <input type="checkbox" id="crosshair-check" checked class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
+                </div>
+            </div>
+
+            <div class="mt-auto space-y-3 pt-4 border-t border-zinc-800">
+                <button id="btn-export-png" class="btn-primary w-full uppercase font-bold text-[10px] py-2">Export Snapshot</button>
+                <button id="clear-all" class="w-full py-1 text-[9px] text-zinc-700 hover:text-red-500 transition-colors uppercase font-bold">Wipe Data</button>
+            </div>
+        </aside>
+
+        <main class="flex-1 bg-zinc-950 relative flex items-center justify-center p-8 overflow-hidden">
+            <div id="viewport-container" class="w-full h-full relative">
+                <div id="viewport" class="mol-container"></div>
+                <div id="hud-stats">
+                    <div class="hud-row"><span class="hud-label">CENTER (X,Y,Z)</span><span id="hud-center" class="hud-val">0.0, 0.0, 0.0</span></div>
+                    <div class="hud-row"><span class="hud-label">SIZE (X,Y,Z)</span><span id="hud-dim" class="hud-val">20.0, 20.0, 20.0</span></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let viewer;
+        let pData = null;
+        const STORAGE_KEY = 'gridscope_v1_beta_v5';
+
+        const hydrophobicityMap = {
+            'ILE': '#ff0000', 'VAL': '#ff0000', 'LEU': '#ff0000', 'PHE': '#ff0000', 
+            'CYS': '#ff4c4c', 'MET': '#ff4c4c', 'ALA': '#ff4c4c', 
+            'GLY': '#ffffff', 'THR': '#ffffff', 'SER': '#ffffff', 'TRP': '#ffffff', 'TYR': '#ffffff', 'PRO': '#ffffff',
+            'HIS': '#7f7fff', 'GLN': '#7f7fff', 'ASN': '#7f7fff', 'GLU': '#7f7fff', 'ASP': '#7f7fff',
+            'LYS': '#0000ff', 'ARG': '#0000ff'
+        };
+
+        function getHydroColor(atom) {
+            if(atom.resn && hydrophobicityMap[atom.resn]) return hydrophobicityMap[atom.resn];
+            return '#cccccc';
+        }
+
+        function initApp() {
+            if (typeof $3Dmol === 'undefined' || typeof $ === 'undefined') {
+                setTimeout(initApp, 100); return;
+            }
+
+            viewer = $3Dmol.createViewer("viewport", { 
+                backgroundColor: "black",
+                antialias: true,
+                preserveDrawingBuffer: true 
+            });
+
+            setupEventListeners();
+            loadFromStorage();
+            updateVisualization();
+        }
+
+        function setupEventListeners() {
+            $('input, select').on('change input', function() {
+                if(this.id === 'grid-opacity') $('#opacity-val').text(this.value);
+                if(this.id === 'grid-thickness') $('#thickness-val').text(this.value + " Å");
+                if(this.id === 'hud-scale') {
+                    $('#hud-scale-val').text(this.value + "x");
+                    document.documentElement.style.setProperty('--hud-scale', this.value);
+                }
+                if(this.id === 'hud-toggle-check') {
+                    const show = $(this).is(':checked');
+                    $('#hud-stats').toggle(show);
+                    $('#hud-controls').css('opacity', show ? '1' : '0.4').css('pointer-events', show ? 'auto' : 'none');
+                }
+                
+                const zoomMode = (this.id === 'ortho-check');
+                updateVisualization(zoomMode);
+                saveToStorage();
+            });
+
+            $('#pdb-upload').on('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    pData = ev.target.result;
+                    $('#protein-name').text(file.name);
+                    updateVisualization(true);
+                };
+                reader.readAsText(file);
+            });
+
+            $('#btn-blind-dock').on('click', () => {
+                if (!pData) return;
+                const lines = pData.split('\n');
+                let minX = Infinity, minY = Infinity, minZ = Infinity;
+                let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+                let found = false;
+
+                lines.forEach(line => {
+                    if (line.startsWith('ATOM') || line.startsWith('HETATM')) {
+                        const x = parseFloat(line.substring(30, 38));
+                        const y = parseFloat(line.substring(38, 46));
+                        const z = parseFloat(line.substring(46, 54));
+                        if (!isNaN(x)) {
+                            minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+                            minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+                            minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
+                            found = true;
+                        }
+                    }
+                });
+
+                if (found) {
+                    const padding = parseFloat($('#blind-padding').val()) || 5.0;
+                    
+                    $('#cx').val(((minX + maxX) / 2).toFixed(1));
+                    $('#cy').val(((minY + maxY) / 2).toFixed(1));
+                    $('#cz').val(((minZ + maxZ) / 2).toFixed(1));
+                    $('#sx').val(((maxX - minX) + (padding * 2)).toFixed(1));
+                    $('#sy').val(((maxY - minY) + (padding * 2)).toFixed(1));
+                    $('#sz').val(((maxZ - minZ) + (padding * 2)).toFixed(1));
+                    updateVisualization(true);
+                    saveToStorage();
+                }
+            });
+
+            $('#align-protein').on('click', () => { 
+                if (!viewer) return;
+                viewer.setView([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+                viewer.zoomTo(); 
+                viewer.render(); 
+            });
+
+            $('#clear-all').on('click', () => $('#wipe-modal').css('display', 'flex'));
+            $('#cancel-wipe').on('click', () => $('#wipe-modal').hide());
+            $('#confirm-wipe').on('click', () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
+            
+            // HUD Drag
+            const hud = document.getElementById('hud-stats');
+            let isDragging = false, startX, startY, startLeft, startTop;
+            hud.addEventListener('mousedown', (e) => {
+                isDragging = true; startX = e.clientX; startY = e.clientY;
+                const rect = hud.getBoundingClientRect();
+                const parentRect = document.getElementById('viewport-container').getBoundingClientRect();
+                hud.style.left = (rect.left - parentRect.left) + 'px';
+                hud.style.top = (rect.top - parentRect.top) + 'px';
+                hud.style.bottom = 'auto';
+                startLeft = parseInt(hud.style.left);
+                startTop = parseInt(hud.style.top);
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                hud.style.left = (startLeft + (e.clientX - startX)) + 'px';
+                hud.style.top = (startTop + (e.clientY - startY)) + 'px';
+            });
+            document.addEventListener('mouseup', () => isDragging = false);
+
+            // Precision Step Controls
+            window.stepCoord = (id, amount) => {
+                const el = document.getElementById(id);
+                const val = parseFloat(el.value) || 0;
+                el.value = (val + amount).toFixed(1);
+                $(el).trigger('change');
+            };
+
+            $('#btn-export-png').on('click', () => {
+                if (!viewer) return;
+
+                const glCanvas = viewer.getCanvas();
+                const hudElement = document.getElementById('hud-stats');
+                const viewportContainer = document.getElementById('viewport-container');
+                const hudScale = parseFloat($('#hud-scale').val()) || 1.0;
+                const isHudVisible = $('#hud-toggle-check').is(':checked');
+
+                const compositeCanvas = document.createElement('canvas');
+                compositeCanvas.width = glCanvas.width;
+                compositeCanvas.height = glCanvas.height;
+                const ctx = compositeCanvas.getContext('2d');
+
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0);
+
+                    if (isHudVisible) {
+                        const parentRect = viewportContainer.getBoundingClientRect();
+                        const hudRect = hudElement.getBoundingClientRect();
+
+                        const scaleX = compositeCanvas.width / parentRect.width;
+                        const scaleY = compositeCanvas.height / parentRect.height;
+
+                        const hudX = (hudRect.left - parentRect.left) * scaleX;
+                        const hudY = (hudRect.top - parentRect.top) * scaleY;
+                        const hudW = hudRect.width * scaleX;
+                        const hudH = hudRect.height * scaleY;
+
+                        const hudStyle = window.getComputedStyle(hudElement);
+
+                        // Draw Background
+                        ctx.fillStyle = hudStyle.backgroundColor || "rgba(9, 9, 11, 0.85)";
+                        ctx.beginPath();
+                        const radius = 4 * scaleX;
+                        ctx.moveTo(hudX + radius, hudY);
+                        ctx.lineTo(hudX + hudW - radius, hudY);
+                        ctx.quadraticCurveTo(hudX + hudW, hudY, hudX + hudW, hudY + radius);
+                        ctx.lineTo(hudX + hudW, hudY + hudH - radius);
+                        ctx.quadraticCurveTo(hudX + hudW, hudY + hudH, hudX + hudW - radius, hudY + hudH);
+                        ctx.lineTo(hudX + radius, hudY + hudH);
+                        ctx.quadraticCurveTo(hudX, hudY + hudH, hudX, hudY + hudH - radius);
+                        ctx.lineTo(hudX, hudY + radius);
+                        ctx.quadraticCurveTo(hudX, hudY, hudX + radius, hudY);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        // Draw Border
+                        ctx.strokeStyle = hudStyle.borderColor || "#8b5cf6";
+                        ctx.lineWidth = 1 * scaleX;
+                        ctx.stroke();
+
+                        const rows = hudElement.querySelectorAll('.hud-row');
+                        ctx.textBaseline = 'top';
+                        
+                        rows.forEach((row) => {
+                            const label = row.querySelector('.hud-label').innerText;
+                            const val = row.querySelector('.hud-val').innerText;
+                            const rowRect = row.getBoundingClientRect();
+                            const rowY = (rowRect.top - parentRect.top) * scaleY;
+                            
+                            ctx.font = `bold ${9 * hudScale * scaleX}px Inter, sans-serif`;
+                            ctx.fillStyle = "#8b5cf6";
+                            ctx.fillText(label, hudX + (14 * hudScale * scaleX), rowY);
+
+                            ctx.font = `${10 * hudScale * scaleX}px "JetBrains Mono", monospace`;
+                            ctx.fillStyle = "#ffffff";
+                            const valWidth = ctx.measureText(val).width;
+                            ctx.fillText(val, hudX + hudW - (14 * hudScale * scaleX) - valWidth, rowY);
+                        });
+                    }
+
+                    const link = document.createElement('a');
+                    link.download = `GridScope_Render_${Date.now()}.png`;
+                    link.href = compositeCanvas.toDataURL("image/png");
+                    link.click();
+                };
+                img.src = viewer.pngURI();
+            });
+        }
+
+        function updateVisualization(shouldZoom = false) {
+            if (!viewer) return;
+            viewer.clear();
+
+            const isOrtho = $('#ortho-check').is(':checked');
+            viewer.setProjection(isOrtho ? "orthographic" : "perspective");
+            viewer.setBackgroundColor($('#bg-mode').val());
+
+            const baseStyle = $('#repr').val();
+            const colorScheme = $('#color-scheme').val();
+            
+            let colorSpec = {};
+            if(colorScheme === 'spectrum') colorSpec = {color: 'spectrum'};
+            else if(colorScheme === 'chain') colorSpec = {colorscheme: 'chain'};
+            else if(colorScheme === 'element') colorSpec = {colorscheme: 'whiteCarbon'};
+            else if(colorScheme === 'hydro') colorSpec = {colorfunc: getHydroColor};
+
+            const styleProps = { ...colorSpec, quality: 10, outline: true };
+
+            if (pData) {
+                const m = viewer.addModel(pData, "pdb");
+                const styleObj = {};
+                styleObj[baseStyle] = styleProps;
+                m.setStyle({}, styleObj);
+            }
+
+            const cx = parseFloat($('#cx').val()) || 0, cy = parseFloat($('#cy').val()) || 0, cz = parseFloat($('#cz').val()) || 0;
+            const sx = parseFloat($('#sx').val()) || 20, sy = parseFloat($('#sy').val()) || 20, sz = parseFloat($('#sz').val()) || 20;
+            const tint = $('#grid-color').val();
+            const opac = parseFloat($('#grid-opacity').val());
+            const thick = parseFloat($('#grid-thickness').val());
+            const showCross = $('#crosshair-check').is(':checked');
+
+            viewer.addBox({center:{x:cx,y:cy,z:cz}, dimensions:{w:sx,h:sy,d:sz}, color:tint, opacity:opac});
+            
+            const x1 = cx - sx/2, x2 = cx + sx/2;
+            const y1 = cy - sy/2, y2 = cy + sy/2;
+            const z1 = cz - sz/2, z2 = cz + sz/2;
+
+            const edges = [
+                [{x:x1,y:y1,z:z1},{x:x2,y:y1,z:z1}],[{x:x2,y:y1,z:z1},{x:x2,y:y1,z:z2}],[{x:x2,y:y1,z:z2},{x:x1,y:y1,z:z2}],[{x:x1,y:y1,z:z2},{x:x1,y:y1,z:z1}],
+                [{x:x1,y:y2,z:z1},{x:x2,y:y2,z:z1}],[{x:x2,y:y2,z:z1},{x:x2,y:y2,z:z2}],[{x:x2,y:y2,z:z2},{x:x1,y:y2,z:z2}],[{x:x1,y:y2,z:z2},{x:x1,y:y2,z:z1}],
+                [{x:x1,y:y1,z:z1},{x:x1,y:y2,z:z1}],[{x:x2,y:y1,z:z1},{x:x2,y:y2,z:z1}],[{x:x2,y:y1,z:z2},{x:x2,y:y2,z:z2}],[{x:x1,y:y1,z:z2},{x:x1,y:y2,z:z2}]
+            ];
+            edges.forEach(e => {
+                viewer.addCylinder({start:e[0], end:e[1], radius:thick, color:tint, fromCap:true, toCap:true});
+            });
+
+            const corners = [
+                {x:x1,y:y1,z:z1},{x:x2,y:y1,z:z1},{x:x2,y:y2,z:z1},{x:x1,y:y2,z:z1},
+                {x:x1,y:y1,z:z2},{x:x2,y:y1,z:z2},{x:x2,y:y2,z:z2},{x:x1,y:y2,z:z2}
+            ];
+            corners.forEach(c => viewer.addSphere({center:c, radius:thick*1.8, color:tint}));
+
+            if(showCross) {
+                viewer.addCylinder({start:{x:x1,y:cy,z:cz}, end:{x:x2,y:cy,z:cz}, radius:thick/2, color:'#ff4444', opacity: 0.6});
+                viewer.addCylinder({start:{x:cx,y:y1,z:cz}, end:{x:cx,y:y2,z:cz}, radius:thick/2, color:'#44ff44', opacity: 0.6});
+                viewer.addCylinder({start:{x:cx,y:cy,z:z1}, end:{x:cx,y:cy,z:z2}, radius:thick/2, color:'#4444ff', opacity: 0.6});
+                viewer.addSphere({center:{x:cx,y:cy,z:cz}, radius: thick*2.2, color:'#ffffff', opacity: 0.8});
+            }
+            
+            $('#hud-center').text(`${cx.toFixed(1)}, ${cy.toFixed(1)}, ${cz.toFixed(1)}`);
+            $('#hud-dim').text(`${sx.toFixed(1)}, ${sy.toFixed(1)}, ${sz.toFixed(1)}`);
+
+            if (shouldZoom) viewer.zoomTo();
+            viewer.render();
+        }
+
+        function saveToStorage() {
+            const s = {
+                cx: $('#cx').val(), cy: $('#cy').val(), cz: $('#cz').val(),
+                sx: $('#sx').val(), sy: $('#sy').val(), sz: $('#sz').val(),
+                tint: $('#grid-color').val(), opac: $('#grid-opacity').val(),
+                thick: $('#grid-thickness').val(), cross: $('#crosshair-check').is(':checked'),
+                ortho: $('#ortho-check').is(':checked'), repr: $('#repr').val(),
+                colorScheme: $('#color-scheme').val(), bg: $('#bg-mode').val(),
+                hudScale: $('#hud-scale').val(),
+                hudVisible: $('#hud-toggle-check').is(':checked')
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+        }
+
+        function loadFromStorage() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (!data) return;
+            const s = JSON.parse(data);
+            $('#cx').val(s.cx); $('#cy').val(s.cy); $('#cz').val(s.cz);
+            $('#sx').val(s.sx); $('#sy').val(s.sy); $('#sz').val(s.sz);
+            if(s.tint) $('#grid-color').val(s.tint);
+            if(s.opac) { $('#grid-opacity').val(s.opac); $('#opacity-val').text(s.opac); }
+            if(s.thick) { $('#grid-thickness').val(s.thick); $('#thickness-val').text(s.thick + " Å"); }
+            if(s.cross !== undefined) $('#crosshair-check').prop('checked', s.cross);
+            if(s.ortho !== undefined) $('#ortho-check').prop('checked', s.ortho);
+            if(s.repr) $('#repr').val(s.repr);
+            if(s.colorScheme) $('#color-scheme').val(s.colorScheme);
+            if(s.bg) $('#bg-mode').val(s.bg);
+            if(s.hudScale) {
+                $('#hud-scale').val(s.hudScale);
+                $('#hud-scale-val').text(s.hudScale + "x");
+                document.documentElement.style.setProperty('--hud-scale', s.hudScale);
+            }
+            if(s.hudVisible !== undefined) {
+                $('#hud-toggle-check').prop('checked', s.hudVisible);
+                $('#hud-stats').toggle(s.hudVisible);
+                $('#hud-controls').css('opacity', s.hudVisible ? '1' : '0.4').css('pointer-events', s.hudVisible ? 'auto' : 'none');
+            }
+        }
+
+        $(document).ready(initApp);
+        window.addEventListener('resize', () => { if(viewer) viewer.resize(); });
+    </script>
+</body>
+</html>
