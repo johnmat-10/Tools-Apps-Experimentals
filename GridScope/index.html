@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GridScope | v1.0.0 Beta</title>
+    <title>Gridscope | v1.0 Beta</title>
     
     <!-- Professional Logo Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M12 2L20 7V17L12 22L4 17V7L12 2Z' stroke='%238b5cf6' stroke-width='2' stroke-linejoin='round'/%3E%3Crect x='8' y='8' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3Crect x='13' y='8' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3Crect x='8' y='13' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3Crect x='13' y='13' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3C/svg%3E">
@@ -81,7 +81,19 @@
         .custom-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; padding-right: 28px; }
         
         .overlay-base { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(12px); background: rgba(9, 9, 11, 0.9); }
-        #confirmation-modal { background: #18181b; border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; width: 340px; text-align: center; }
+        #confirmation-modal, #export-content { background: #18181b; border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; }
+        #confirmation-modal { width: 340px; }
+        #export-content { width: 420px; }
+
+        /* Mode Tabs Styles */
+        .tab-btn { transition: all 0.2s ease; }
+        .tab-active { background-color: var(--brand-dark); color: white; border: 1px solid var(--brand-primary); }
+        .tab-inactive { color: #71717a; border: 1px solid transparent; }
+        .tab-inactive:hover { color: #d4d4d8; background: #27272a; }
+
+        .explain-box { border-left: 2px solid #f59e0b; background: rgba(245, 158, 11, 0.05); padding: 8px; border-radius: 0 4px 4px 0; margin-top: 8px; }
+        .explain-title { color: #f59e0b; font-size: 9px; font-weight: 800; uppercase; letter-spacing: 0.05em; margin-bottom: 2px; display:flex; align-items:center; gap:4px; }
+        .explain-text { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #d4d4d8; line-height: 1.4; }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
@@ -100,10 +112,44 @@
         </div>
     </div>
 
+    <!-- Export Modal -->
+    <div id="export-modal" class="overlay-base">
+        <div id="export-content">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-[#8b5cf6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    <h3 class="text-white font-bold text-sm uppercase tracking-wide">Export Configuration</h3>
+                </div>
+                <button id="close-export" class="text-zinc-500 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Format Tabs -->
+            <div class="flex gap-2 mb-4 p-1 bg-black/40 rounded border border-zinc-800">
+                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-active" data-format="vina">Vina / GNINA</button>
+                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive" data-format="ad4">AutoDock 4</button>
+                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive" data-format="glide">Glide</button>
+            </div>
+
+            <!-- Output Area -->
+            <div class="relative">
+                <textarea id="config-output" class="vina-drop w-full h-48 p-3 rounded mb-4 text-xs bg-black/50 border border-zinc-700 text-emerald-400 focus:border-[#8b5cf6] outline-none" readonly></textarea>
+                <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-zinc-800/80 rounded text-[8px] text-zinc-400 uppercase font-bold tracking-wider" id="format-label">VINA CONF</div>
+            </div>
+
+            <div class="flex gap-2">
+                <button id="copy-config" class="flex-1 btn-secondary hover:text-white transition-colors">Copy to Clipboard</button>
+                <button id="download-config" class="flex-1 btn-primary">Download File</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <nav class="h-12 bg-black border-b border-[#27272a] flex items-center px-6 justify-between z-30 shadow-2xl">
         <div class="flex items-center gap-6">
             <div class="flex items-center gap-3">
+                <!-- Precision Logo -->
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_0_8px_rgba(139,92,246,0.6)]">
                     <path d="M12 2L20 7V17L12 22L4 17V7L12 2Z" stroke="#8b5cf6" stroke-width="2" stroke-linejoin="round"/>
                     <rect x="8" y="8" width="3" height="3" rx="0.5" fill="#8b5cf6" class="animate-pulse"/>
@@ -111,12 +157,12 @@
                     <rect x="8" y="13" width="3" height="3" rx="0.5" fill="#8b5cf6"/>
                     <rect x="13" y="13" width="3" height="3" rx="0.5" fill="#8b5cf6" class="animate-pulse" style="animation-delay: 0.5s"/>
                 </svg>
-                <div class="font-bold tracking-tighter text-white text-base uppercase font-sans">Grid<span class="text-[#8b5cf6] font-medium">Scope</span></div>
+                <div class="font-bold tracking-tighter text-white text-base uppercase font-sans">Grid<span class="text-[#8b5cf6] font-medium">scope</span></div>
             </div>
             <div class="h-4 w-[1px] bg-zinc-800"></div>
             <div id="file-status" class="text-zinc-500 font-medium text-[10px] uppercase tracking-[0.2em]">Geometry Engine Active</div>
         </div>
-        <div class="px-2 py-1 bg-[#2e1065] border border-[#8b5cf6]/50 rounded text-[9px] text-[#8b5cf6] font-mono tracking-tighter uppercase font-bold shadow-[0_0_10px_rgba(139,92,246,0.2)]">v1.0.0 BETA</div>
+        <div class="px-2 py-1 bg-[#2e1065] border border-[#8b5cf6]/50 rounded text-[9px] text-[#8b5cf6] font-mono tracking-tighter uppercase font-bold shadow-[0_0_10px_rgba(139,92,246,0.2)]">v1.0 BETA</div>
     </nav>
 
     <div class="flex flex-1 overflow-hidden">
@@ -126,7 +172,7 @@
             <div class="control-group">
                 <div class="space-y-2.5">
                     <label class="group block cursor-pointer">
-                        <input type="file" id="pdb-upload" accept=".pdb" class="hidden">
+                        <input type="file" id="pdb-upload" accept=".pdb,.pdbqt" class="hidden">
                         <div class="flex items-center justify-between p-2.5 rounded bg-zinc-900 border border-zinc-800 hover:border-[#8b5cf6] transition-all">
                             <div class="flex flex-col">
                                 <span class="text-[9px] text-zinc-600 uppercase font-extrabold">Receptor PDB</span>
@@ -140,7 +186,13 @@
 
             <div class="section-label">Grid Engineering (Å)</div>
             <div class="control-group">
-                <!-- Manual Coordinates with Steppers -->
+                <!-- Docking Mode Switcher -->
+                <div class="flex gap-2 mb-4 p-1 bg-black/40 rounded border border-zinc-800">
+                    <button id="tab-blind" class="tab-btn flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-active">Blind</button>
+                    <button id="tab-specific" class="tab-btn flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive">Specific</button>
+                </div>
+
+                <!-- Shared Coordinates -->
                 <div class="grid grid-cols-3 gap-2 mb-4">
                     <div class="flex flex-col gap-1">
                         <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Center X</span>
@@ -194,9 +246,8 @@
                     </div>
                 </div>
 
-                <!-- Blind Docking Subsection -->
-                <div class="border-t border-zinc-800 pt-3 mb-3">
-                    <div class="text-[9px] font-extrabold text-zinc-500 uppercase mb-2 tracking-wider">Blind Docking</div>
+                <!-- Blind Docking Panel -->
+                <div id="panel-blind" class="border-t border-zinc-800 pt-3 mb-3">
                     <div class="flex gap-2 items-end">
                          <div class="flex flex-col gap-1 w-1/3">
                             <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Padding</span>
@@ -206,7 +257,37 @@
                     </div>
                 </div>
 
-                <button id="align-protein" class="btn-secondary w-full uppercase font-bold text-[9px] py-2 mt-1">Reset Viewport</button>
+                <!-- Specific Docking Panel -->
+                <div id="panel-specific" class="hidden border-t border-zinc-800 pt-3 mb-3">
+                    <div class="flex gap-2 mb-2">
+                        <div class="flex flex-col gap-1 w-full">
+                            <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Target List (Residue ID[:Chain])</span>
+                            <input type="text" id="target-input" class="input-field mono text-center py-1.5 text-emerald-400 placeholder-zinc-700" placeholder="e.g. 41:A, 145:A">
+                        </div>
+                    </div>
+                    <button id="btn-focus-res" class="btn-secondary w-full text-[9px] uppercase font-bold py-1.5 mb-2 hover:text-emerald-400 hover:border-emerald-500 transition-colors">Target Residues</button>
+                    
+                    <button id="btn-clear-targets" class="btn-secondary w-full py-1.5 text-[9px] font-bold text-red-400 border-red-900/30 hover:bg-red-900/20 flex items-center justify-center gap-2" title="Clear Selected Targets">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        Clear Selection
+                    </button>
+                </div>
+
+                <div class="flex gap-2 mt-2">
+                    <button id="align-protein" class="btn-secondary flex-1 uppercase font-bold text-[9px] py-2">Reset View</button>
+                    <button id="btn-open-export" class="btn-primary flex-1 uppercase font-bold text-[9px] py-2 text-white shadow-[0_0_10px_rgba(139,92,246,0.3)]">Export Grid</button>
+                </div>
+
+                <!-- Explainability Panel -->
+                <div class="explain-box">
+                    <div class="explain-title">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Methodology & Context
+                    </div>
+                    <div id="explain-text" class="explain-text">
+                        Load a protein structure to see geometric context and box rationale.
+                    </div>
+                </div>
             </div>
 
             <div class="section-label">Studio Settings</div>
@@ -258,6 +339,10 @@
                     <label class="text-[9px] text-zinc-600 uppercase font-extrabold text-[#8b5cf6]">Show Data Overlay</label>
                     <input type="checkbox" id="hud-toggle-check" checked class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
                 </div>
+                <div class="flex items-center justify-between border-b border-zinc-800/50 pb-3">
+                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold text-[#8b5cf6]">Structure Outlines</label>
+                    <input type="checkbox" id="outline-check" checked class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
+                </div>
                 <div id="hud-controls" class="space-y-2">
                     <div class="flex justify-between text-[10px] text-zinc-500 font-bold uppercase"><span>HUD Scale</span><span id="hud-scale-val" class="text-[#8b5cf6] font-mono">1.0x</span></div>
                     <input type="range" id="hud-scale" min="0.6" max="1.4" step="0.1" value="1.0" class="accent-slider">
@@ -296,7 +381,12 @@
     <script>
         let viewer;
         let pData = null;
-        const STORAGE_KEY = 'gridscope_v1_beta_v5';
+        let pType = "pdb"; 
+        const STORAGE_KEY = 'gridscope_v1_beta_v16';
+        let currentExportFormat = 'vina';
+        let currentDockingMode = 'manual'; 
+        let lastTargetDescription = null; 
+        let activeTargets = new Set(); 
 
         const hydrophobicityMap = {
             'ILE': '#ff0000', 'VAL': '#ff0000', 'LEU': '#ff0000', 'PHE': '#ff0000', 
@@ -327,7 +417,190 @@
             updateVisualization();
         }
 
+        function updateExplanation(cx, cy, cz, sx, sy, sz) {
+            if(!pData) {
+                $('#explain-text').html("Load a protein structure to see geometric context and box rationale.");
+                return;
+            }
+
+            let html = "";
+            if (currentDockingMode === 'blind') {
+                const pad = $('#blind-padding').val();
+                html = `<strong>Blind Docking Protocol</strong><br>
+                        <span class="text-zinc-400">Scope:</span> Whole Protein<br>
+                        <span class="text-zinc-400">Center:</span> Calculated geometric centroid of all atoms.<br>
+                        <span class="text-zinc-400">Boundaries:</span> Protein extents + <span class="text-[#8b5cf6] font-bold">${pad}Å</span> padding.`;
+            } else if (currentDockingMode === 'specific') {
+                html = `<strong>Site-Specific Protocol</strong><br>`;
+                if(lastTargetDescription) {
+                    html += `<span class="text-zinc-400">Target(s):</span> <span class="text-[#8b5cf6] font-bold">${lastTargetDescription}</span><br>`;
+                    html += `<span class="text-zinc-400">Rationale:</span> Grid centered on geometric center of selected residues.`;
+                } else {
+                    html += `<span class="text-zinc-500 italic">No targets selected. Enter Residue ID to select.</span>`;
+                }
+            } else {
+                html = `<strong>Manual Configuration</strong><br>
+                        <span class="text-zinc-400">Coordinates:</span> Manually adjusted.<br>
+                        <span class="text-zinc-400">Center:</span> ${cx}, ${cy}, ${cz}`;
+            }
+            $('#explain-text').html(html);
+        }
+
+        function generateConfig(format) {
+            const cx = parseFloat($('#cx').val()).toFixed(3);
+            const cy = parseFloat($('#cy').val()).toFixed(3);
+            const cz = parseFloat($('#cz').val()).toFixed(3);
+            const sx = parseFloat($('#sx').val()).toFixed(3);
+            const sy = parseFloat($('#sy').val()).toFixed(3);
+            const sz = parseFloat($('#sz').val()).toFixed(3);
+
+            if (format === 'vina') {
+                return `center_x = ${cx}\ncenter_y = ${cy}\ncenter_z = ${cz}\n\nsize_x = ${sx}\nsize_y = ${sy}\nsize_z = ${sz}\n\n# Generated by Gridscope`;
+            } else if (format === 'ad4') {
+                const spacing = 0.375;
+                const calcPts = (val) => {
+                    let pts = Math.round(val / spacing);
+                    if (pts % 2 !== 0) pts += 1;
+                    return pts;
+                };
+                const nptsX = calcPts(sx);
+                const nptsY = calcPts(sy);
+                const nptsZ = calcPts(sz);
+                
+                return `# AutoDock 4 GPF Parameters\n# Approx Size: ${sx} x ${sy} x ${sz} A\n\nnpts ${nptsX} ${nptsY} ${nptsZ}\ngridfld rec.maps.fld\nspacing ${spacing}\nreceptor_types A C HD N NA OA SA\nligand_types A C HD N NA OA SA\ngridcenter ${cx} ${cy} ${cz}\nsmooth 0.5\nmap rec.A.map\nmap rec.C.map\nmap rec.HD.map\nmap rec.N.map\nmap rec.NA.map\nmap rec.OA.map\nmap rec.SA.map\nelec rec.e.map\ndsolv rec.d.map\n`;
+            } else if (format === 'glide') {
+                return `# Schrödinger Glide Grid\n\nGRID_CENTER   ${cx}, ${cy}, ${cz}\nGRIDBOX_SIZE  ${sx}, ${sy}, ${sz}\nGRIDBOX_AROUND_LIGAND = False\n`;
+            }
+            return "";
+        }
+
+        function recalculateTargetCenter() {
+            if(activeTargets.size === 0) {
+                lastTargetDescription = null;
+                updateExplanation($('#cx').val(), $('#cy').val(), $('#cz').val(), $('#sx').val(), $('#sy').val(), $('#sz').val());
+                $('#file-status').text("No targets selected");
+                return;
+            }
+
+            const m = viewer.getModel(0);
+            
+            const targets = [];
+            activeTargets.forEach(t => {
+                const parts = t.split(':');
+                targets.push({chain: parts[0] === '_' ? null : parts[0], resi: parseInt(parts[1])});
+            });
+
+            const atoms = m.selectedAtoms(atom => {
+                for(let t of targets) {
+                    if (atom.resi === t.resi && (t.chain === null || atom.chain === t.chain)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            if(atoms.length === 0) return;
+
+            let sumX=0, sumY=0, sumZ=0;
+            atoms.forEach(a => { sumX+=a.x; sumY+=a.y; sumZ+=a.z; });
+            
+            const cx = sumX / atoms.length;
+            const cy = sumY / atoms.length;
+            const cz = sumZ / atoms.length;
+
+            $('#cx').val(cx.toFixed(1));
+            $('#cy').val(cy.toFixed(1));
+            $('#cz').val(cz.toFixed(1));
+
+            // Update Description string
+            const uniqueRes = new Set();
+            atoms.forEach(a => {
+                uniqueRes.add(`${a.resn}${a.resi}${a.chain ? ':'+a.chain : ''}`);
+            });
+            
+            const resArray = Array.from(uniqueRes);
+            if(resArray.length <= 4) {
+                lastTargetDescription = resArray.join(", ");
+            } else {
+                lastTargetDescription = `${resArray.slice(0, 3).join(", ")} + ${resArray.length - 3} others`;
+            }
+
+            currentDockingMode = 'specific';
+            updateVisualization(false);
+            saveToStorage();
+            
+            $('#file-status').text(`Targets: ${uniqueRes.size}`).addClass('text-[#8b5cf6]');
+            setTimeout(()=>$('#file-status').text("Geometry Engine Active").removeClass('text-[#8b5cf6]'), 2000);
+        }
+
         function setupEventListeners() {
+            // DOCKING MODE TABS
+            $('#tab-blind').on('click', () => {
+                $('#tab-blind').addClass('tab-active').removeClass('tab-inactive');
+                $('#tab-specific').addClass('tab-inactive').removeClass('tab-active');
+                $('#panel-blind').removeClass('hidden');
+                $('#panel-specific').addClass('hidden');
+                
+                $('#target-input').val('');
+                activeTargets.clear();
+                lastTargetDescription = null; 
+                $('#file-status').text("Mode: Blind Docking");
+                
+                currentDockingMode = 'blind'; 
+                saveToStorage();
+                updateVisualization(false); 
+            });
+
+            $('#tab-specific').on('click', () => {
+                $('#tab-specific').addClass('tab-active').removeClass('tab-inactive');
+                $('#tab-blind').addClass('tab-inactive').removeClass('tab-active');
+                $('#panel-specific').removeClass('hidden');
+                $('#panel-blind').addClass('hidden');
+                
+                $('#blind-padding').val('5.0');
+                $('#file-status').text("Mode: Site Specific");
+                
+                currentDockingMode = 'specific';
+                saveToStorage();
+                updateVisualization(false);
+            });
+
+            // EXPORT MODAL HANDLERS
+            $('#btn-open-export').on('click', () => {
+                $('#export-modal').css('display', 'flex');
+                $('.export-tab[data-format="vina"]').trigger('click');
+            });
+            $('#close-export').on('click', () => $('#export-modal').hide());
+            
+            $('.export-tab').on('click', function() {
+                $('.export-tab').removeClass('tab-active').addClass('tab-inactive');
+                $(this).addClass('tab-active').removeClass('tab-inactive');
+                currentExportFormat = $(this).data('format');
+                $('#config-output').val(generateConfig(currentExportFormat));
+                
+                const labels = { 'vina': 'VINA / GNINA CONF', 'ad4': 'AUTODOCK 4 GPF', 'glide': 'GLIDE IN' };
+                $('#format-label').text(labels[currentExportFormat]);
+            });
+
+            $('#copy-config').on('click', () => {
+                const text = $('#config-output').val();
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = $('#copy-config').text();
+                    $('#copy-config').text("Copied!");
+                    setTimeout(() => $('#copy-config').text(originalText), 1500);
+                });
+            });
+
+            $('#download-config').on('click', () => {
+                const text = $('#config-output').val();
+                const extensions = { 'vina': 'txt', 'ad4': 'gpf', 'glide': 'in' };
+                const blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `grid_config.${extensions[currentExportFormat]}`;
+                link.click();
+            });
+
             $('input, select').on('change input', function() {
                 if(this.id === 'grid-opacity') $('#opacity-val').text(this.value);
                 if(this.id === 'grid-thickness') $('#thickness-val').text(this.value + " Å");
@@ -342,6 +615,11 @@
                 }
                 
                 const zoomMode = (this.id === 'ortho-check');
+                
+                if(['cx','cy','cz','sx','sy','sz'].includes(this.id)) {
+                    currentDockingMode = 'manual';
+                }
+
                 updateVisualization(zoomMode);
                 saveToStorage();
             });
@@ -352,6 +630,9 @@
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     pData = ev.target.result;
+                    pdbName = file.name;
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    pType = (ext === 'pdbqt') ? 'pdbqt' : 'pdb';
                     $('#protein-name').text(file.name);
                     updateVisualization(true);
                 };
@@ -360,6 +641,9 @@
 
             $('#btn-blind-dock').on('click', () => {
                 if (!pData) return;
+                currentDockingMode = 'blind';
+                lastTargetDescription = null;
+                activeTargets.clear(); 
                 const lines = pData.split('\n');
                 let minX = Infinity, minY = Infinity, minZ = Infinity;
                 let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
@@ -393,6 +677,61 @@
                 }
             });
 
+            // TARGET BUTTON Logic
+            $('#btn-focus-res').on('click', () => {
+                if(!pData) return;
+                
+                const inputVal = $('#target-input').val();
+                if(!inputVal.trim()) return;
+
+                activeTargets.clear();
+
+                const parts = inputVal.split(',');
+                let foundAny = false;
+
+                parts.forEach(part => {
+                    part = part.trim();
+                    if(!part) return;
+
+                    let resi, chain;
+                    
+                    if(part.includes(':')) {
+                        const chunks = part.split(':');
+                        if(!isNaN(parseInt(chunks[0]))) {
+                            resi = parseInt(chunks[0]);
+                            chain = chunks[1].toUpperCase();
+                        } else {
+                            chain = chunks[0].toUpperCase();
+                            resi = parseInt(chunks[1]);
+                        }
+                    } else {
+                        resi = parseInt(part);
+                        chain = null;
+                    }
+
+                    if(!isNaN(resi)) {
+                        activeTargets.add((chain || '_') + ":" + resi);
+                        foundAny = true;
+                    }
+                });
+
+                if(foundAny) {
+                    recalculateTargetCenter();
+                } else {
+                    $('#file-status').text("Invalid Input Format").addClass('text-red-500');
+                    setTimeout(()=>$('#file-status').text("Geometry Engine Active").removeClass('text-red-500'), 2000);
+                }
+            });
+
+            // CLEAR TARGETS
+            $('#btn-clear-targets').on('click', () => {
+                activeTargets.clear();
+                recalculateTargetCenter();
+                $('#target-input').val('');
+                $('#file-status').text("Targets Cleared");
+                setTimeout(()=>$('#file-status').text("Geometry Engine Active"), 1500);
+            });
+
             $('#align-protein').on('click', () => { 
                 if (!viewer) return;
                 viewer.setView([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
@@ -404,7 +743,6 @@
             $('#cancel-wipe').on('click', () => $('#wipe-modal').hide());
             $('#confirm-wipe').on('click', () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
             
-            // HUD Drag
             const hud = document.getElementById('hud-stats');
             let isDragging = false, startX, startY, startLeft, startTop;
             hud.addEventListener('mousedown', (e) => {
@@ -425,8 +763,8 @@
             });
             document.addEventListener('mouseup', () => isDragging = false);
 
-            // Precision Step Controls
             window.stepCoord = (id, amount) => {
+                currentDockingMode = 'manual';
                 const el = document.getElementById(id);
                 const val = parseFloat(el.value) || 0;
                 el.value = (val + amount).toFixed(1);
@@ -465,7 +803,6 @@
 
                         const hudStyle = window.getComputedStyle(hudElement);
 
-                        // Draw Background
                         ctx.fillStyle = hudStyle.backgroundColor || "rgba(9, 9, 11, 0.85)";
                         ctx.beginPath();
                         const radius = 4 * scaleX;
@@ -481,7 +818,6 @@
                         ctx.closePath();
                         ctx.fill();
 
-                        // Draw Border
                         ctx.strokeStyle = hudStyle.borderColor || "#8b5cf6";
                         ctx.lineWidth = 1 * scaleX;
                         ctx.stroke();
@@ -518,13 +854,16 @@
         function updateVisualization(shouldZoom = false) {
             if (!viewer) return;
             viewer.clear();
+            
+            // Re-ordered fog logic
+            viewer.setBackgroundColor($('#bg-mode').val());
 
             const isOrtho = $('#ortho-check').is(':checked');
             viewer.setProjection(isOrtho ? "orthographic" : "perspective");
-            viewer.setBackgroundColor($('#bg-mode').val());
 
             const baseStyle = $('#repr').val();
             const colorScheme = $('#color-scheme').val();
+            const outlines = $('#outline-check').is(':checked');
             
             let colorSpec = {};
             if(colorScheme === 'spectrum') colorSpec = {color: 'spectrum'};
@@ -532,10 +871,14 @@
             else if(colorScheme === 'element') colorSpec = {colorscheme: 'whiteCarbon'};
             else if(colorScheme === 'hydro') colorSpec = {colorfunc: getHydroColor};
 
-            const styleProps = { ...colorSpec, quality: 10, outline: true };
+            const styleProps = { 
+                ...colorSpec, 
+                quality: 10, 
+                outline: outlines 
+            };
 
             if (pData) {
-                const m = viewer.addModel(pData, "pdb");
+                const m = viewer.addModel(pData, pType); 
                 const styleObj = {};
                 styleObj[baseStyle] = styleProps;
                 m.setStyle({}, styleObj);
@@ -579,6 +922,8 @@
             $('#hud-center').text(`${cx.toFixed(1)}, ${cy.toFixed(1)}, ${cz.toFixed(1)}`);
             $('#hud-dim').text(`${sx.toFixed(1)}, ${sy.toFixed(1)}, ${sz.toFixed(1)}`);
 
+            updateExplanation(cx, cy, cz, sx, sy, sz);
+
             if (shouldZoom) viewer.zoomTo();
             viewer.render();
         }
@@ -592,7 +937,9 @@
                 ortho: $('#ortho-check').is(':checked'), repr: $('#repr').val(),
                 colorScheme: $('#color-scheme').val(), bg: $('#bg-mode').val(),
                 hudScale: $('#hud-scale').val(),
-                hudVisible: $('#hud-toggle-check').is(':checked')
+                hudVisible: $('#hud-toggle-check').is(':checked'),
+                outline: $('#outline-check').is(':checked'),
+                mode: $('#tab-blind').hasClass('tab-active') ? 'blind' : 'specific'
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
         }
@@ -620,6 +967,14 @@
                 $('#hud-toggle-check').prop('checked', s.hudVisible);
                 $('#hud-stats').toggle(s.hudVisible);
                 $('#hud-controls').css('opacity', s.hudVisible ? '1' : '0.4').css('pointer-events', s.hudVisible ? 'auto' : 'none');
+            }
+            if(s.outline !== undefined) $('#outline-check').prop('checked', s.outline);
+            
+            // Restore Tab State & Last Mode
+            if(s.mode === 'specific') {
+                $('#tab-specific').trigger('click');
+            } else {
+                $('#tab-blind').trigger('click');
             }
         }
 
