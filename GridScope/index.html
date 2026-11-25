@@ -3,138 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gridscope | v1.0 Beta</title>
+    <title>Gridscope | v1.1</title>
     
-    <!-- Professional Logo Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M12 2L20 7V17L12 22L4 17V7L12 2Z' stroke='%238b5cf6' stroke-width='2' stroke-linejoin='round'/%3E%3Crect x='8' y='8' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3Crect x='13' y='8' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3Crect x='8' y='13' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3Crect x='13' y='13' width='3' height='3' rx='0.5' fill='%238b5cf6'/%3E%3C/svg%3E">
+    <!-- Precision Isometric Logo Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M12 2.5L20.5 7.4V16.6L12 21.5L3.5 16.6V7.4L12 2.5Z' stroke='%2306b6d4' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cpath d='M12 2.5V12M12 12L20.5 7.4M12 12L3.5 7.4M12 12V21.5' stroke='%2306b6d4' stroke-width='1.3' stroke-opacity='0.55'/%3E%3Ccircle cx='12' cy='12' r='2.4' fill='%2310b981'/%3E%3C/svg%3E">
 
     <!-- Essential Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --brand-dark: #2e1065;
-            --brand-primary: #8b5cf6;
-            --bg-main: #09090b;
-            --bg-sidebar: #121214;
-            --border-color: #27272a;
+            --brand-dark: #0e7490;
+            --brand-primary: #06b6d4;
+            --brand-accent: #10b981;
+            --bg-main: #07090e;
+            --bg-sidebar: #0d1117;
+            --bg-card: #131922;
+            --border-color: #1f2937;
             --hud-scale: 1.0;
         }
 
         body { 
             background-color: var(--bg-main); 
-            color: #e4e4e7; 
-            font-family: 'Inter', sans-serif;
+            color: #e2e8f0; 
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
-        .mono { font-family: 'JetBrains Mono', monospace; }
+        .mono { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
         input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-        .sidebar { width: 360px; border-right: 1px solid var(--border-color); background: var(--bg-sidebar); z-index: 20; }
-        .control-group { background: #18181b; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .section-label { font-size: 10px; font-weight: 800; color: #52525b; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .sidebar { width: 374px; border-right: 1px solid var(--border-color); background: var(--bg-sidebar); z-index: 20; }
+        .control-group {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-top-color: #2d3748;
+            border-radius: 10px;
+            padding: 13px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.45);
+        }
+        .section-label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 
-        .input-field { background: #09090b; border: 1px solid var(--border-color); color: #fafafa; font-size: 12px; padding: 5px 8px; border-radius: 4px; width: 100%; outline: none; transition: all 0.2s ease; }
-        .input-field:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.4); }
+        .input-field { background: #090d14; border: 1px solid var(--border-color); color: #f8fafc; font-size: 12px; padding: 5px 8px; border-radius: 6px; width: 100%; outline: none; transition: all 0.2s ease; }
+        .input-field:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.22); }
 
-        .btn-step { background: #09090b; border: 1px solid var(--border-color); color: #71717a; padding: 2px 6px; font-size: 10px; border-radius: 3px; transition: all 0.2s; cursor: pointer; }
-        .btn-step:hover { background: #27272a; color: var(--brand-primary); border-color: var(--brand-primary); }
+        .btn-step { background: #090d14; border: 1px solid var(--border-color); color: #94a3b8; padding: 2px 6px; font-size: 10px; border-radius: 4px; transition: all 0.15s; cursor: pointer; }
+        .btn-step:hover { background: #1e293b; color: var(--brand-primary); border-color: var(--brand-primary); }
 
         .btn-primary { 
-            background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 100%); 
-            color: white; 
-            font-weight: 600; font-size: 12px; padding: 8px; border-radius: 4px; 
-            border: 1px solid var(--brand-primary);
+            background: linear-gradient(135deg, #0e7490 0%, #06b6d4 100%); 
+            color: #042f2e; 
+            font-weight: 700; font-size: 11px; padding: 8px; border-radius: 6px; 
+            border: 1px solid #22d3ee;
             transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; 
         }
-        .btn-primary:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 14px -4px rgba(6, 182, 212, 0.5); }
 
-        .btn-secondary { background: #27272a; color: #e4e4e7; font-weight: 500; font-size: 11px; padding: 6px; border-radius: 4px; border: 1px solid #3f3f46; transition: all 0.2s; cursor: pointer; }
-        .btn-secondary:hover { background: #3f3f46; }
+        .btn-secondary { background: #1e293b; color: #e2e8f0; font-weight: 600; font-size: 11px; padding: 6px; border-radius: 6px; border: 1px solid #334155; transition: all 0.15s; cursor: pointer; }
+        .btn-secondary:hover { background: #273549; border-color: #475569; }
+        .btn-secondary.active-toggle { background: rgba(6, 182, 212, 0.18); border-color: var(--brand-primary); color: #67e8f9; }
 
-        #viewport-container { margin: auto; position: relative; background: #000; border-radius: 4px; overflow: hidden; width: 100%; height: 100%; transition: width 0.3s ease, height 0.3s ease; }
+        #viewport-container { margin: auto; position: relative; background: #000; border-radius: 8px; border: 1px solid #1e293b; overflow: hidden; width: 100%; height: 100%; transition: box-shadow 0.2s ease; }
+        #viewport-container.drag-over { box-shadow: inset 0 0 0 2px #06b6d4; }
         .mol-container { width: 100%; height: 100%; position: relative; min-height: 400px; }
         
         #hud-stats {
-            position: absolute; bottom: 8px; left: 8px;
-            background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(12px);
-            border: 1px solid var(--brand-primary); border-radius: 4px;
+            position: absolute; bottom: 14px; left: 14px;
+            background: rgba(7, 9, 14, 0.88); backdrop-filter: blur(14px);
+            border: 1px solid rgba(6, 182, 212, 0.55); border-radius: 8px;
             padding: calc(10px * var(--hud-scale)) calc(14px * var(--hud-scale)); 
             pointer-events: auto; user-select: none; cursor: grab;
-            font-family: 'JetBrains Mono', monospace; 
+            font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums;
             font-size: calc(10px * var(--hud-scale)); 
-            color: #e4e4e7;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            color: #e2e8f0;
+            box-shadow: 0 12px 30px -10px rgba(0,0,0,0.65);
             z-index: 10;
             width: auto;
-            min-width: calc(200px * var(--hud-scale));
+            min-width: calc(220px * var(--hud-scale));
         }
-        .hud-row { display: flex; justify-content: space-between; gap: calc(24px * var(--hud-scale)); border-bottom: 1px solid rgba(255,255,255,0.05); padding: calc(4px * var(--hud-scale)) 0; }
-        .hud-row:last-child { border: none; }
-        .hud-label { color: #8b5cf6; font-weight: 700; letter-spacing: 0.05em; font-size: calc(9px * var(--hud-scale)); }
-        .hud-val { color: #fff; font-weight: 500; }
+        #hud-stats.hud-light {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+        }
+        #hud-stats.hud-light .hud-row { border-bottom-color: rgba(15, 23, 42, 0.08); }
+        #hud-stats.hud-light .hud-label { color: #475569; }
+        #hud-stats.hud-light .hud-val { color: #0f172a; font-weight: 700; }
 
-        .accent-slider { accent-color: var(--brand-primary); width: 100%; height: 4px; border-radius: 2px; background: #27272a; cursor: pointer; }
-        .custom-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; padding-right: 28px; }
+        .hud-row { display: flex; justify-content: space-between; gap: calc(20px * var(--hud-scale)); border-bottom: 1px solid rgba(255,255,255,0.06); padding: calc(3px * var(--hud-scale)) 0; }
+        .hud-row:last-child { border: none; }
+        .hud-label { color: #22d3ee; font-weight: 700; letter-spacing: 0.06em; font-size: calc(9px * var(--hud-scale)); }
+        .hud-val { color: #f8fafc; font-weight: 600; }
+
+        .accent-slider { accent-color: var(--brand-primary); width: 100%; height: 4px; border-radius: 2px; background: #1e293b; cursor: pointer; }
+        .custom-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; padding-right: 28px; }
         
-        .overlay-base { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(12px); background: rgba(9, 9, 11, 0.9); }
-        #confirmation-modal, #export-content { background: #18181b; border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; }
+        .overlay-base { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(14px); background: rgba(7, 9, 14, 0.86); }
+        #confirmation-modal, #export-content, #snapshot-content { background: #131922; border: 1px solid #1f2937; border-radius: 14px; padding: 24px; text-align: center; box-shadow: 0 24px 48px -12px rgba(0,0,0,0.7); }
         #confirmation-modal { width: 340px; }
-        #export-content { width: 420px; }
+        #export-content { width: 500px; max-width: 92vw; }
+        #snapshot-content { width: 400px; max-width: 92vw; }
 
         /* Mode Tabs Styles */
-        .tab-btn { transition: all 0.2s ease; }
-        .tab-active { background-color: var(--brand-dark); color: white; border: 1px solid var(--brand-primary); }
-        .tab-inactive { color: #71717a; border: 1px solid transparent; }
-        .tab-inactive:hover { color: #d4d4d8; background: #27272a; }
+        .tab-btn { transition: all 0.2s ease; cursor: pointer; }
+        .tab-active { background-color: rgba(6, 182, 212, 0.16); color: #67e8f9; border: 1px solid var(--brand-primary); }
+        .tab-inactive { color: #64748b; border: 1px solid transparent; }
+        .tab-inactive:hover { color: #e2e8f0; background: #1e293b; }
 
-        .explain-box { border-left: 2px solid #f59e0b; background: rgba(245, 158, 11, 0.05); padding: 8px; border-radius: 0 4px 4px 0; margin-top: 8px; }
-        .explain-title { color: #f59e0b; font-size: 9px; font-weight: 800; uppercase; letter-spacing: 0.05em; margin-bottom: 2px; display:flex; align-items:center; gap:4px; }
-        .explain-text { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #d4d4d8; line-height: 1.4; }
+        .explain-box { border-left: 2px solid #06b6d4; background: rgba(6, 182, 212, 0.06); padding: 9px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+        .explain-title { color: #22d3ee; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
+        .explain-text { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #cbd5e1; line-height: 1.5; }
+
+        .warn-box { border-left: 2px solid #f43f5e; background: rgba(244, 63, 94, 0.08); padding: 6px 8px; border-radius: 0 6px 6px 0; margin-top: 8px; font-size: 9px; color: #fda4af; display: none; }
 
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden select-none">
 
+    <!-- Reset Modal -->
     <div id="wipe-modal" class="overlay-base">
         <div id="confirmation-modal">
             <h3 class="text-white font-bold text-lg mb-1">Reset Session</h3>
             <p class="text-zinc-400 text-xs mb-6 px-4">This will clear all structural data and reset the grid geometry. Continue?</p>
             <div class="flex gap-2">
                 <button id="cancel-wipe" class="flex-1 btn-secondary">Cancel</button>
-                <button id="confirm-wipe" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded py-2 transition-colors">Clear All</button>
+                <button id="confirm-wipe" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded py-2 transition-colors cursor-pointer">Clear All</button>
             </div>
         </div>
     </div>
 
-    <!-- Export Modal -->
+    <!-- Export Config / Scripts Modal -->
     <div id="export-modal" class="overlay-base">
         <div id="export-content">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-[#8b5cf6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                    <h3 class="text-white font-bold text-sm uppercase tracking-wide">Export Configuration</h3>
+                    <h3 class="text-white font-bold text-sm uppercase tracking-wide">Export Configuration &amp; Scripts</h3>
                 </div>
-                <button id="close-export" class="text-zinc-500 hover:text-white transition-colors">
+                <button id="close-export" class="text-zinc-500 hover:text-white transition-colors cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
             <!-- Format Tabs -->
-            <div class="flex gap-2 mb-4 p-1 bg-black/40 rounded border border-zinc-800">
-                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-active" data-format="vina">Vina / GNINA</button>
-                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive" data-format="ad4">AutoDock 4</button>
-                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive" data-format="glide">Glide</button>
+            <div class="flex gap-1 mb-4 p-1 bg-black/40 rounded border border-zinc-800">
+                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-active cursor-pointer" data-format="vina">Vina</button>
+                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive cursor-pointer" data-format="ad4">AD4</button>
+                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive cursor-pointer" data-format="glide">Glide</button>
+                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive cursor-pointer" data-format="pymol">PyMOL</button>
+                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive cursor-pointer" data-format="chimerax">ChimeraX</button>
+                <button class="export-tab flex-1 py-1.5 text-[9px] font-bold uppercase rounded tab-inactive cursor-pointer" data-format="methods">Methods</button>
             </div>
 
             <!-- Output Area -->
             <div class="relative">
-                <textarea id="config-output" class="vina-drop w-full h-48 p-3 rounded mb-4 text-xs bg-black/50 border border-zinc-700 text-emerald-400 focus:border-[#8b5cf6] outline-none" readonly></textarea>
+                <textarea id="config-output" class="mono w-full h-56 p-3 rounded mb-4 text-[11px] bg-black/50 border border-zinc-700 text-emerald-400 focus:border-[#8b5cf6] outline-none resize-none" readonly></textarea>
                 <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-zinc-800/80 rounded text-[8px] text-zinc-400 uppercase font-bold tracking-wider" id="format-label">VINA CONF</div>
             </div>
 
@@ -145,46 +175,133 @@
         </div>
     </div>
 
-    <!-- Header -->
-    <nav class="h-12 bg-black border-b border-[#27272a] flex items-center px-6 justify-between z-30 shadow-2xl">
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3">
-                <!-- Precision Logo -->
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_0_8px_rgba(139,92,246,0.6)]">
-                    <path d="M12 2L20 7V17L12 22L4 17V7L12 2Z" stroke="#8b5cf6" stroke-width="2" stroke-linejoin="round"/>
-                    <rect x="8" y="8" width="3" height="3" rx="0.5" fill="#8b5cf6" class="animate-pulse"/>
-                    <rect x="13" y="8" width="3" height="3" rx="0.5" fill="#8b5cf6"/>
-                    <rect x="8" y="13" width="3" height="3" rx="0.5" fill="#8b5cf6"/>
-                    <rect x="13" y="13" width="3" height="3" rx="0.5" fill="#8b5cf6" class="animate-pulse" style="animation-delay: 0.5s"/>
-                </svg>
-                <div class="font-bold tracking-tighter text-white text-base uppercase font-sans">Grid<span class="text-[#8b5cf6] font-medium">scope</span></div>
+    <!-- High-DPI Snapshot Modal -->
+    <div id="snapshot-modal" class="overlay-base">
+        <div id="snapshot-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-white font-bold text-sm uppercase tracking-wide">Publication Snapshot</h3>
+                <button id="close-snapshot" class="text-zinc-500 hover:text-white transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
-            <div class="h-4 w-[1px] bg-zinc-800"></div>
-            <div id="file-status" class="text-zinc-500 font-medium text-[10px] uppercase tracking-[0.2em]">Geometry Engine Active</div>
+            <div class="space-y-3 text-left mb-5">
+                <div>
+                    <label class="text-[9px] text-zinc-400 uppercase font-bold block mb-1">Journal Width Preset</label>
+                    <select id="snap-width-preset" class="input-field custom-select py-1.5">
+                        <option value="viewport">Current Viewport (Screen)</option>
+                        <option value="90" selected>Single Column (90 mm)</option>
+                        <option value="180">Double Column (180 mm)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[9px] text-zinc-400 uppercase font-bold block mb-1">Target Resolution</label>
+                    <select id="snap-dpi" class="input-field custom-select py-1.5">
+                        <option value="300" selected>300 DPI (Standard Print)</option>
+                        <option value="600">600 DPI (High-Res / Line Art)</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                    <label class="text-[10px] text-zinc-300 font-semibold">Transparent Background</label>
+                    <input type="checkbox" id="snap-transparent" class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
+                </div>
+                <div id="snap-dim-preview" class="text-[10px] mono text-[#8b5cf6] bg-black/40 border border-zinc-800 rounded p-2 text-center">
+                    Output: 1063 × 797 px
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button id="cancel-snapshot" class="flex-1 btn-secondary">Cancel</button>
+                <button id="confirm-snapshot" class="flex-1 btn-primary">Render PNG</button>
+            </div>
         </div>
-        <div class="px-2 py-1 bg-[#2e1065] border border-[#8b5cf6]/50 rounded text-[9px] text-[#8b5cf6] font-mono tracking-tighter uppercase font-bold shadow-[0_0_10px_rgba(139,92,246,0.2)]">v1.0 BETA</div>
+    </div>
+
+    <!-- Import Config Modal -->
+    <div id="import-modal" class="overlay-base">
+        <div id="export-content">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-white font-bold text-sm uppercase tracking-wide">Import Docking Config</h3>
+                <button id="close-import" class="text-zinc-500 hover:text-white transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <p class="text-[10px] text-zinc-400 text-left mb-2">Paste Vina (`center_x`, `size_x`), AutoDock 4 (`gridcenter`, `npts`, `spacing`), or Glide (`GRID_CENTER`, `OUTERBOX`) parameters:</p>
+            <textarea id="import-input" class="mono w-full h-40 p-3 rounded mb-3 text-[11px] bg-black/60 border border-zinc-700 text-zinc-200 focus:border-[#8b5cf6] outline-none resize-none" placeholder="center_x = 12.5&#10;center_y = -4.2&#10;center_z = 8.0&#10;size_x = 22.0&#10;size_y = 22.0&#10;size_z = 22.0"></textarea>
+            <div class="flex gap-2">
+                <button id="cancel-import" class="flex-1 btn-secondary">Cancel</button>
+                <button id="apply-import" class="flex-1 btn-primary">Apply to Grid</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <nav class="h-12 bg-[#090d14] border-b border-[#1f2937] flex items-center px-6 justify-between z-30 shadow-2xl">
+        <div class="flex items-center gap-5">
+            <div class="flex items-center gap-2.5">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">
+                    <path d="M12 2.5L20.5 7.4V16.6L12 21.5L3.5 16.6V7.4L12 2.5Z" stroke="#06b6d4" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M12 2.5V12M12 12L20.5 7.4M12 12L3.5 7.4M12 12V21.5" stroke="#06b6d4" stroke-width="1.2" stroke-opacity="0.5"/>
+                    <circle cx="12" cy="12" r="2.3" fill="#10b981"/>
+                </svg>
+                <div class="font-extrabold tracking-tight text-white text-sm uppercase">Grid<span class="text-[#06b6d4] font-semibold">scope</span></div>
+            </div>
+            <div class="h-4 w-[1px] bg-slate-800"></div>
+            <div id="file-status" class="text-slate-400 font-medium text-[10px] uppercase tracking-[0.18em]">Geometry Engine Active</div>
+        </div>
+        <div class="flex items-center gap-2.5">
+            <button id="btn-share-url" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-md text-[9px] text-slate-300 uppercase font-bold tracking-wider transition-colors cursor-pointer" title="Copy shareable link with current PDB and grid coordinates">Share Link</button>
+            <button id="btn-pub-preset" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-md text-[9px] text-slate-200 uppercase font-bold tracking-wider transition-colors cursor-pointer" title="Switch to white background, colorblind-safe palette, and clean cage">Publication Mode</button>
+            <div class="px-2 py-0.5 bg-cyan-950/80 border border-cyan-500/40 rounded-md text-[9px] text-cyan-300 mono tracking-tight uppercase font-bold">v1.1</div>
+        </div>
     </nav>
 
     <div class="flex flex-1 overflow-hidden">
         <aside class="sidebar flex flex-col overflow-y-auto p-5 custom-scrollbar">
             
-            <div class="section-label">Structure Engine</div>
-            <div class="control-group">
-                <div class="space-y-2.5">
+            <div class="section-label"><span>Structure Engine</span><span class="text-[8px] text-zinc-600 font-normal normal-case">Drag &amp; drop supported</span></div>
+            <div class="control-group space-y-2.5">
+                <label class="group block cursor-pointer">
+                    <input type="file" id="pdb-upload" accept=".pdb,.pdbqt,.cif,.mmcif" class="hidden">
+                    <div class="flex items-center justify-between p-2.5 rounded bg-zinc-900 border border-zinc-800 hover:border-[#8b5cf6] transition-all">
+                        <div class="flex flex-col">
+                            <span class="text-[9px] text-zinc-500 uppercase font-extrabold">Receptor (.pdb, .pdbqt, .cif)</span>
+                            <span id="protein-name" class="text-[11px] text-zinc-300 truncate max-w-[220px]">Select or Drop File</span>
+                        </div>
+                        <svg class="w-4 h-4 text-zinc-600 group-hover:text-[#8b5cf6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    </div>
+                </label>
+
+                <!-- RCSB PDB Fetch + Sample -->
+                <div class="flex gap-1.5">
+                    <input type="text" id="rcsb-id" maxlength="4" placeholder="RCSB ID (e.g. 1ATP)" class="input-field mono uppercase text-[11px] py-1.5">
+                    <button id="btn-fetch-pdb" class="btn-secondary px-2.5 text-[10px] uppercase font-bold whitespace-nowrap">Fetch</button>
+                    <button id="btn-sample-1atp" class="btn-secondary px-2 text-[9px] uppercase font-bold text-[#c4b5fd] border-[#8b5cf6]/40 hover:border-[#8b5cf6] whitespace-nowrap" title="Load sample complex 1ATP">1ATP</button>
+                </div>
+
+                <!-- Optional Ligand Upload & Co-crystal Detection -->
+                <div class="border-t border-zinc-800 pt-2.5 space-y-2">
                     <label class="group block cursor-pointer">
-                        <input type="file" id="pdb-upload" accept=".pdb,.pdbqt" class="hidden">
-                        <div class="flex items-center justify-between p-2.5 rounded bg-zinc-900 border border-zinc-800 hover:border-[#8b5cf6] transition-all">
+                        <input type="file" id="ligand-upload" accept=".sdf,.mol2,.pdb,.pdbqt" class="hidden">
+                        <div class="flex items-center justify-between px-2.5 py-1.5 rounded bg-zinc-900/60 border border-zinc-800 hover:border-emerald-500/60 transition-all">
                             <div class="flex flex-col">
-                                <span class="text-[9px] text-zinc-600 uppercase font-extrabold">Receptor PDB</span>
-                                <span id="protein-name" class="text-[11px] text-zinc-300 truncate max-w-[180px]">Select File</span>
+                                <span class="text-[8px] text-zinc-500 uppercase font-extrabold">Ligand / Docked Poses</span>
+                                <span id="ligand-name" class="text-[10px] text-zinc-400 truncate max-w-[220px]">Upload .sdf, .mol2, .pdb, .pdbqt</span>
                             </div>
-                            <svg class="w-4 h-4 text-zinc-700 group-hover:text-[#8b5cf6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                            <svg class="w-3.5 h-3.5 text-zinc-600 group-hover:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         </div>
                     </label>
+                    <div id="pose-switcher" class="hidden flex items-center justify-between gap-1.5 bg-zinc-900/80 border border-zinc-800 rounded px-2 py-1">
+                        <button id="btn-pose-prev" class="btn-step px-2">◀</button>
+                        <span id="pose-label" class="text-[10px] mono text-emerald-400 truncate">Pose 1/1</span>
+                        <button id="btn-pose-next" class="btn-step px-2">▶</button>
+                    </div>
+                    <div id="hetatm-row" class="hidden flex gap-1.5 items-center">
+                        <select id="hetatm-select" class="input-field custom-select text-[10px] py-1 flex-1"></select>
+                        <button id="btn-fit-ligand" class="btn-secondary text-[9px] uppercase font-bold px-2.5 py-1 text-emerald-400 border-emerald-900/50 hover:border-emerald-500 whitespace-nowrap">Fit Ligand</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="section-label">Grid Engineering (Å)</div>
+            <div class="section-label"><span>Grid Engineering (Å)</span><span id="vol-badge" class="text-[9px] mono text-[#8b5cf6]">8000 Å³</span></div>
             <div class="control-group">
                 <!-- Docking Mode Switcher -->
                 <div class="flex gap-2 mb-4 p-1 bg-black/40 rounded border border-zinc-800">
@@ -193,55 +310,55 @@
                 </div>
 
                 <!-- Shared Coordinates -->
-                <div class="grid grid-cols-3 gap-2 mb-4">
+                <div class="grid grid-cols-3 gap-2 mb-3">
                     <div class="flex flex-col gap-1">
                         <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Center X</span>
-                        <input type="number" id="cx" value="0.0" step="0.1" class="input-field mono text-center py-1">
+                        <input type="number" id="cx" value="0.0" step="0.5" class="input-field mono text-center py-1">
                         <div class="flex gap-1">
-                            <button onclick="stepCoord('cx', -0.1)" class="btn-step flex-1">-</button>
-                            <button onclick="stepCoord('cx', 0.1)" class="btn-step flex-1">+</button>
+                            <button onclick="stepCoord('cx', -0.5)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('cx', 0.5)" class="btn-step flex-1">+</button>
                         </div>
                     </div>
                     <div class="flex flex-col gap-1">
                         <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Center Y</span>
-                        <input type="number" id="cy" value="0.0" step="0.1" class="input-field mono text-center py-1">
+                        <input type="number" id="cy" value="0.0" step="0.5" class="input-field mono text-center py-1">
                         <div class="flex gap-1">
-                            <button onclick="stepCoord('cy', -0.1)" class="btn-step flex-1">-</button>
-                            <button onclick="stepCoord('cy', 0.1)" class="btn-step flex-1">+</button>
+                            <button onclick="stepCoord('cy', -0.5)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('cy', 0.5)" class="btn-step flex-1">+</button>
                         </div>
                     </div>
                     <div class="flex flex-col gap-1">
                         <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Center Z</span>
-                        <input type="number" id="cz" value="0.0" step="0.1" class="input-field mono text-center py-1">
+                        <input type="number" id="cz" value="0.0" step="0.5" class="input-field mono text-center py-1">
                         <div class="flex gap-1">
-                            <button onclick="stepCoord('cz', -0.1)" class="btn-step flex-1">-</button>
-                            <button onclick="stepCoord('cz', 0.1)" class="btn-step flex-1">+</button>
+                            <button onclick="stepCoord('cz', -0.5)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('cz', 0.5)" class="btn-step flex-1">+</button>
                         </div>
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 mb-4">
                     <div class="flex flex-col gap-1">
                         <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Width</span>
-                        <input type="number" id="sx" value="20.0" step="1" class="input-field mono text-center py-1">
+                        <input type="number" id="sx" value="20.0" min="1" step="0.5" class="input-field mono text-center py-1">
                         <div class="flex gap-1">
-                            <button onclick="stepCoord('sx', -0.1)" class="btn-step flex-1">-</button>
-                            <button onclick="stepCoord('sx', 0.1)" class="btn-step flex-1">+</button>
+                            <button onclick="stepCoord('sx', -0.5)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('sx', 0.5)" class="btn-step flex-1">+</button>
                         </div>
                     </div>
                     <div class="flex flex-col gap-1">
                         <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Height</span>
-                        <input type="number" id="sy" value="20.0" step="1" class="input-field mono text-center py-1">
+                        <input type="number" id="sy" value="20.0" min="1" step="0.5" class="input-field mono text-center py-1">
                         <div class="flex gap-1">
-                            <button onclick="stepCoord('sy', -0.1)" class="btn-step flex-1">-</button>
-                            <button onclick="stepCoord('sy', 0.1)" class="btn-step flex-1">+</button>
+                            <button onclick="stepCoord('sy', -0.5)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('sy', 0.5)" class="btn-step flex-1">+</button>
                         </div>
                     </div>
                     <div class="flex flex-col gap-1">
                         <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Depth</span>
-                        <input type="number" id="sz" value="20.0" step="1" class="input-field mono text-center py-1">
+                        <input type="number" id="sz" value="20.0" min="1" step="0.5" class="input-field mono text-center py-1">
                         <div class="flex gap-1">
-                            <button onclick="stepCoord('sz', -0.1)" class="btn-step flex-1">-</button>
-                            <button onclick="stepCoord('sz', 0.1)" class="btn-step flex-1">+</button>
+                            <button onclick="stepCoord('sz', -0.5)" class="btn-step flex-1">-</button>
+                            <button onclick="stepCoord('sz', 0.5)" class="btn-step flex-1">+</button>
                         </div>
                     </div>
                 </div>
@@ -249,40 +366,69 @@
                 <!-- Blind Docking Panel -->
                 <div id="panel-blind" class="border-t border-zinc-800 pt-3 mb-3">
                     <div class="flex gap-2 items-end">
-                         <div class="flex flex-col gap-1 w-1/3">
-                            <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Padding</span>
-                            <input type="number" id="blind-padding" value="5.0" step="1.0" class="input-field mono text-center py-1.5 text-[#8b5cf6] font-bold">
+                        <div class="flex flex-col gap-1 w-1/3">
+                            <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Padding (Å)</span>
+                            <input type="number" id="blind-padding" value="5.0" min="0" step="1.0" class="input-field mono text-center py-1.5 text-[#8b5cf6] font-bold">
                         </div>
                         <button id="btn-blind-dock" class="btn-secondary flex-1 text-[9px] uppercase font-bold py-2 mb-[1px]">Auto-Fit to Protein</button>
                     </div>
                 </div>
 
                 <!-- Specific Docking Panel -->
-                <div id="panel-specific" class="hidden border-t border-zinc-800 pt-3 mb-3">
-                    <div class="flex gap-2 mb-2">
-                        <div class="flex flex-col gap-1 w-full">
-                            <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Target List (Residue ID[:Chain])</span>
-                            <input type="text" id="target-input" class="input-field mono text-center py-1.5 text-emerald-400 placeholder-zinc-700" placeholder="e.g. 41:A, 145:A">
+                <div id="panel-specific" class="hidden border-t border-zinc-800 pt-3 mb-3 space-y-2">
+                    <div class="flex gap-2 items-end">
+                        <div class="flex flex-col gap-1 flex-1">
+                            <span class="text-[8px] uppercase text-zinc-500 font-bold block">Target List (Residue ID[:Chain])</span>
+                            <input type="text" id="target-input" class="input-field mono py-1.5 text-emerald-400 placeholder-zinc-700" placeholder="e.g. 41:A, 145:A">
+                        </div>
+                        <div class="flex flex-col gap-1 w-16">
+                            <span class="text-[8px] uppercase text-zinc-500 font-bold block text-center">Pad (Å)</span>
+                            <input type="number" id="site-padding" value="6.0" min="0" step="1.0" class="input-field mono text-center py-1.5 text-emerald-400 font-bold">
                         </div>
                     </div>
-                    <button id="btn-focus-res" class="btn-secondary w-full text-[9px] uppercase font-bold py-1.5 mb-2 hover:text-emerald-400 hover:border-emerald-500 transition-colors">Target Residues</button>
-                    
-                    <button id="btn-clear-targets" class="btn-secondary w-full py-1.5 text-[9px] font-bold text-red-400 border-red-900/30 hover:bg-red-900/20 flex items-center justify-center gap-2" title="Clear Selected Targets">
+                    <div class="flex items-center justify-between text-[9px] text-zinc-400 px-0.5">
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="auto-size-site" checked class="w-3.5 h-3.5 accent-[#8b5cf6]">
+                            <span>Auto-size box</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="show-res-labels" checked class="w-3.5 h-3.5 accent-[#8b5cf6]">
+                            <span>Residue labels</span>
+                        </label>
+                    </div>
+                    <div class="flex gap-1.5">
+                        <button id="btn-focus-res" class="btn-secondary flex-1 text-[9px] uppercase font-bold py-1.5 hover:text-emerald-400 hover:border-emerald-500 transition-colors">Target Residues</button>
+                        <button id="btn-click-select" class="btn-secondary px-2.5 text-[9px] uppercase font-bold py-1.5" title="Click residues in 3D viewport to add/remove">3D Pick</button>
+                    </div>
+                    <button id="btn-clear-targets" class="btn-secondary w-full py-1.5 text-[9px] font-bold text-red-400 border-red-900/30 hover:bg-red-900/20 flex items-center justify-center gap-2">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         Clear Selection
                     </button>
                 </div>
 
-                <div class="flex gap-2 mt-2">
+                <div class="flex gap-1.5 mt-2">
                     <button id="align-protein" class="btn-secondary flex-1 uppercase font-bold text-[9px] py-2">Reset View</button>
-                    <button id="btn-open-export" class="btn-primary flex-1 uppercase font-bold text-[9px] py-2 text-white shadow-[0_0_10px_rgba(139,92,246,0.3)]">Export Grid</button>
+                    <button id="zoom-grid" class="btn-secondary flex-1 uppercase font-bold text-[9px] py-2">Zoom Box</button>
+                    <button id="btn-open-import" class="btn-secondary flex-1 uppercase font-bold text-[9px] py-2">Import</button>
+                    <button id="btn-open-export" class="btn-primary flex-1 uppercase font-bold text-[9px] py-2 text-white shadow-[0_0_10px_rgba(139,92,246,0.3)]">Export</button>
                 </div>
+
+                <!-- Saved Multi-Box Presets -->
+                <div class="flex gap-1.5 items-center mt-2 pt-2 border-t border-zinc-800/80">
+                    <select id="preset-select" class="input-field custom-select text-[10px] py-1 flex-1">
+                        <option value="">Saved Boxes (0)</option>
+                    </select>
+                    <button id="btn-save-preset" class="btn-secondary px-2 py-1 text-[9px] uppercase font-bold" title="Save current box preset">+ Save</button>
+                    <button id="btn-del-preset" class="btn-secondary px-2 py-1 text-[9px] text-red-400 font-bold" title="Delete selected box preset">×</button>
+                </div>
+
+                <div id="grid-warning" class="warn-box"></div>
 
                 <!-- Explainability Panel -->
                 <div class="explain-box">
                     <div class="explain-title">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Methodology & Context
+                        Methodology &amp; Context
                     </div>
                     <div id="explain-text" class="explain-text">
                         Load a protein structure to see geometric context and box rationale.
@@ -291,10 +437,10 @@
             </div>
 
             <div class="section-label">Studio Settings</div>
-            <div class="control-group space-y-4">
+            <div class="control-group space-y-3.5">
                 <div class="grid grid-cols-2 gap-2">
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[9px] text-zinc-600 uppercase font-extrabold">Base Style</label>
+                        <label class="text-[9px] text-zinc-500 uppercase font-extrabold">Base Style</label>
                         <select id="repr" class="input-field custom-select py-1.5">
                             <option value="cartoon" selected>Cartoon</option>
                             <option value="stick">Stick</option>
@@ -302,21 +448,35 @@
                         </select>
                     </div>
                     <div class="flex flex-col gap-1.5">
-                         <label class="text-[9px] text-zinc-600 uppercase font-extrabold">Coloring</label>
-                         <select id="color-scheme" class="input-field custom-select py-1.5">
-                             <option value="spectrum" selected>Rainbow</option>
-                             <option value="chain">Chain ID</option>
-                             <option value="hydro">Hydrophobicity</option>
-                             <option value="element">Element</option>
-                         </select>
+                        <label class="text-[9px] text-zinc-500 uppercase font-extrabold">Coloring</label>
+                        <select id="color-scheme" class="input-field custom-select py-1.5">
+                            <option value="okabe" selected>Colorblind-Safe</option>
+                            <option value="gray">Uniform Slate</option>
+                            <option value="chain">Chain ID</option>
+                            <option value="hydro">Hydrophobicity</option>
+                            <option value="element">Element</option>
+                            <option value="spectrum">Rainbow (Legacy)</option>
+                        </select>
                     </div>
                 </div>
-                <div class="flex items-center justify-between border-t border-zinc-800 pt-3">
-                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold text-[#8b5cf6]">Orthographic Cam</label>
+                <div class="flex items-center justify-between border-t border-zinc-800 pt-2.5">
+                    <label class="text-[9px] text-zinc-400 uppercase font-extrabold">Hide Waters (HOH) &amp; Ions</label>
+                    <input type="checkbox" id="hide-waters-check" checked class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
+                </div>
+                <div class="flex items-center justify-between border-t border-zinc-800 pt-2.5">
+                    <label class="text-[9px] text-zinc-400 uppercase font-extrabold">Molecular Surface</label>
+                    <input type="checkbox" id="surface-check" class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
+                </div>
+                <div id="surface-controls" class="hidden space-y-1.5">
+                    <div class="flex justify-between text-[9px] text-zinc-500 font-bold uppercase"><span>Surface Opacity</span><span id="surface-opac-val" class="text-[#8b5cf6] font-mono">0.65</span></div>
+                    <input type="range" id="surface-opacity" min="0.1" max="1.0" step="0.05" value="0.65" class="accent-slider">
+                </div>
+                <div class="flex items-center justify-between border-t border-zinc-800 pt-2.5">
+                    <label class="text-[9px] text-zinc-400 uppercase font-extrabold">Orthographic Cam</label>
                     <input type="checkbox" id="ortho-check" class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
                 </div>
-                <div class="flex flex-col gap-1.5 border-t border-zinc-800 pt-3">
-                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold">Background</label>
+                <div class="flex flex-col gap-1.5 border-t border-zinc-800 pt-2.5">
+                    <label class="text-[9px] text-zinc-500 uppercase font-extrabold">Background</label>
                     <select id="bg-mode" class="input-field custom-select py-1.5">
                         <option value="black" selected>Solid Black</option>
                         <option value="white">Laboratory White</option>
@@ -325,212 +485,767 @@
             </div>
 
             <div class="section-label">Visual Fidelity</div>
-            <div class="control-group space-y-4">
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold">Primary Tint</label>
-                    <select id="grid-color" class="input-field custom-select py-1.5">
-                        <option value="#8b5cf6" selected>Hologram Violet</option>
-                        <option value="#06b6d4">Cyber Cyan</option>
-                        <option value="#10b981">Matrix Green</option>
-                        <option value="#f43f5e">Alert Red</option>
-                    </select>
+            <div class="control-group space-y-3.5">
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[9px] text-zinc-500 uppercase font-extrabold">Box Style</label>
+                        <select id="box-style" class="input-field custom-select py-1.5">
+                            <option value="cage" selected>Solid Cage</option>
+                            <option value="wireframe">Wireframe Only</option>
+                            <option value="dashed">Dashed Edges</option>
+                            <option value="dual">Dual Inner/Outer</option>
+                            <option value="sphere">Spherical Pocket</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[9px] text-zinc-500 uppercase font-extrabold">Primary Tint</label>
+                        <select id="grid-color" class="input-field custom-select py-1.5">
+                            <option value="#06b6d4" selected>Precision Cyan</option>
+                            <option value="#8b5cf6">Hologram Violet</option>
+                            <option value="#009e73">Teal (Safe)</option>
+                            <option value="#334155">Charcoal (Paper)</option>
+                            <option value="#09090b">Ink Black (Paper)</option>
+                            <option value="#f43f5e">Alert Red</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="flex items-center justify-between border-b border-zinc-800/50 pb-3">
-                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold text-[#8b5cf6]">Show Data Overlay</label>
+                <div class="flex items-center justify-between border-b border-zinc-800/50 pb-2.5">
+                    <label class="text-[9px] text-zinc-400 uppercase font-extrabold">Show Data Overlay</label>
                     <input type="checkbox" id="hud-toggle-check" checked class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
                 </div>
-                <div class="flex items-center justify-between border-b border-zinc-800/50 pb-3">
-                    <label class="text-[9px] text-zinc-600 uppercase font-extrabold text-[#8b5cf6]">Structure Outlines</label>
+                <div class="flex items-center justify-between border-b border-zinc-800/50 pb-2.5">
+                    <label class="text-[9px] text-zinc-400 uppercase font-extrabold">Structure Outlines</label>
                     <input type="checkbox" id="outline-check" checked class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
                 </div>
-                <div id="hud-controls" class="space-y-2">
+                <div id="hud-controls" class="space-y-1.5">
                     <div class="flex justify-between text-[10px] text-zinc-500 font-bold uppercase"><span>HUD Scale</span><span id="hud-scale-val" class="text-[#8b5cf6] font-mono">1.0x</span></div>
                     <input type="range" id="hud-scale" min="0.6" max="1.4" step="0.1" value="1.0" class="accent-slider">
                 </div>
-                <div class="space-y-2">
+                <div class="space-y-1.5">
                     <div class="flex justify-between text-[10px] text-zinc-500 font-bold uppercase"><span>Glow Intensity</span><span id="opacity-val" class="text-[#8b5cf6] font-mono">0.12</span></div>
                     <input type="range" id="grid-opacity" min="0" max="0.5" step="0.01" value="0.12" class="accent-slider">
                 </div>
-                <div class="space-y-2">
+                <div class="space-y-1.5">
                     <div class="flex justify-between text-[10px] text-zinc-500 font-bold uppercase"><span>Cage Thickness</span><span id="thickness-val" class="text-[#8b5cf6] font-mono">0.30 Å</span></div>
                     <input type="range" id="grid-thickness" min="0.05" max="1.0" step="0.05" value="0.30" class="accent-slider">
                 </div>
-                <div class="flex items-center justify-between border-t border-zinc-800 pt-3">
-                    <span class="text-[9px] text-zinc-500 font-bold uppercase">Axis Crosshairs</span>
-                    <input type="checkbox" id="crosshair-check" checked class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
+                <div class="flex items-center justify-between border-t border-zinc-800 pt-2.5">
+                    <span class="text-[9px] text-zinc-500 font-bold uppercase">Axis Crosshairs (RGB)</span>
+                    <input type="checkbox" id="crosshair-check" class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
+                </div>
+                <div class="flex items-center justify-between border-t border-zinc-800 pt-2.5">
+                    <span class="text-[9px] text-zinc-500 font-bold uppercase">10 Å Scale Bar</span>
+                    <input type="checkbox" id="scalebar-check" class="w-4 h-4 accent-[#8b5cf6] cursor-pointer">
                 </div>
             </div>
 
-            <div class="mt-auto space-y-3 pt-4 border-t border-zinc-800">
-                <button id="btn-export-png" class="btn-primary w-full uppercase font-bold text-[10px] py-2">Export Snapshot</button>
-                <button id="clear-all" class="w-full py-1 text-[9px] text-zinc-700 hover:text-red-500 transition-colors uppercase font-bold">Wipe Data</button>
+            <div class="mt-auto space-y-2.5 pt-4 border-t border-zinc-800">
+                <button id="btn-export-png" class="btn-primary w-full uppercase font-bold text-[10px] py-2">Export Snapshot (DPI)</button>
+                <button id="clear-all" class="w-full py-1 text-[9px] text-zinc-600 hover:text-red-500 transition-colors uppercase font-bold cursor-pointer">Wipe Data</button>
             </div>
         </aside>
 
-        <main class="flex-1 bg-zinc-950 relative flex items-center justify-center p-8 overflow-hidden">
+        <main class="flex-1 bg-zinc-950 relative flex items-center justify-center p-6 overflow-hidden">
             <div id="viewport-container" class="w-full h-full relative">
                 <div id="viewport" class="mol-container"></div>
                 <div id="hud-stats">
                     <div class="hud-row"><span class="hud-label">CENTER (X,Y,Z)</span><span id="hud-center" class="hud-val">0.0, 0.0, 0.0</span></div>
                     <div class="hud-row"><span class="hud-label">SIZE (X,Y,Z)</span><span id="hud-dim" class="hud-val">20.0, 20.0, 20.0</span></div>
+                    <div class="hud-row"><span class="hud-label">VOLUME</span><span id="hud-vol" class="hud-val">8000 Å³</span></div>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        let viewer;
+        let viewer = null;
+        let receptorModel = null;
+        let ligandModel = null;
         let pData = null;
-        let pType = "pdb"; 
-        const STORAGE_KEY = 'gridscope_v1_beta_v16';
+        let pType = "pdb";
+        let pdbName = "";
+        let ligData = null;
+        let ligType = "sdf";
+        let hetatmGroups = {};
+        let ligandPoses = [];
+        let currentPoseIdx = 0;
+
+        const STORAGE_KEY = 'gridscope_v1_1_state';
+        const PRESETS_KEY = 'gridscope_v1_1_presets';
+        let boxPresets = {};
+        let gridHistory = [];
+        let gridHistoryIdx = -1;
+        let isRestoringHistory = false;
         let currentExportFormat = 'vina';
-        let currentDockingMode = 'manual'; 
-        let lastTargetDescription = null; 
-        let activeTargets = new Set(); 
+        let currentDockingMode = 'blind';
+        let lastTargetDescription = null;
+        let activeTargets = new Set();
+        let clickSelectActive = false;
+
+        // Okabe-Ito colorblind-safe palette
+        const OKABE_ITO = ['#0072B2', '#E69F00', '#009E73', '#CC79A7', '#56B4E9', '#D55E00', '#F0E442'];
+        const chainColorCache = {};
 
         const hydrophobicityMap = {
-            'ILE': '#ff0000', 'VAL': '#ff0000', 'LEU': '#ff0000', 'PHE': '#ff0000', 
-            'CYS': '#ff4c4c', 'MET': '#ff4c4c', 'ALA': '#ff4c4c', 
-            'GLY': '#ffffff', 'THR': '#ffffff', 'SER': '#ffffff', 'TRP': '#ffffff', 'TYR': '#ffffff', 'PRO': '#ffffff',
-            'HIS': '#7f7fff', 'GLN': '#7f7fff', 'ASN': '#7f7fff', 'GLU': '#7f7fff', 'ASP': '#7f7fff',
-            'LYS': '#0000ff', 'ARG': '#0000ff'
+            'ILE': '#d55e00', 'VAL': '#d55e00', 'LEU': '#d55e00', 'PHE': '#d55e00',
+            'CYS': '#e69f00', 'MET': '#e69f00', 'ALA': '#e69f00',
+            'GLY': '#e4e4e7', 'THR': '#e4e4e7', 'SER': '#e4e4e7', 'TRP': '#e4e4e7', 'TYR': '#e4e4e7', 'PRO': '#e4e4e7',
+            'HIS': '#56b4e9', 'GLN': '#56b4e9', 'ASN': '#56b4e9', 'GLU': '#56b4e9', 'ASP': '#56b4e9',
+            'LYS': '#0072b2', 'ARG': '#0072b2'
         };
 
         function getHydroColor(atom) {
-            if(atom.resn && hydrophobicityMap[atom.resn]) return hydrophobicityMap[atom.resn];
-            return '#cccccc';
+            return (atom.resn && hydrophobicityMap[atom.resn]) ? hydrophobicityMap[atom.resn] : '#cccccc';
+        }
+
+        function getOkabeColor(atom) {
+            const ch = atom.chain || 'A';
+            if (!chainColorCache[ch]) {
+                const idx = Object.keys(chainColorCache).length % OKABE_ITO.length;
+                chainColorCache[ch] = OKABE_ITO[idx];
+            }
+            return chainColorCache[ch];
+        }
+
+        function safeNum(val, fallback) {
+            const n = parseFloat(val);
+            return Number.isFinite(n) ? n : fallback;
+        }
+
+        function setStatus(msg, colorClass = '', duration = 0) {
+            const el = $('#file-status');
+            el.removeClass('text-[#8b5cf6] text-red-500 text-emerald-400').text(msg);
+            if (colorClass) el.addClass(colorClass);
+            if (duration > 0) {
+                setTimeout(() => el.removeClass(colorClass).text("Geometry Engine Active"), duration);
+            }
         }
 
         function initApp() {
             if (typeof $3Dmol === 'undefined' || typeof $ === 'undefined') {
-                setTimeout(initApp, 100); return;
+                setTimeout(initApp, 100);
+                return;
             }
 
-            viewer = $3Dmol.createViewer("viewport", { 
+            viewer = $3Dmol.createViewer("viewport", {
                 backgroundColor: "black",
                 antialias: true,
-                preserveDrawingBuffer: true 
+                preserveDrawingBuffer: true
             });
 
             setupEventListeners();
             loadFromStorage();
-            updateVisualization();
+            loadPresetsFromStorage();
+
+            const params = new URLSearchParams(window.location.search);
+            ['cx','cy','cz','sx','sy','sz'].forEach(k => {
+                if (params.has(k) && !isNaN(parseFloat(params.get(k)))) {
+                    $('#' + k).val(parseFloat(params.get(k)).toFixed(1));
+                }
+            });
+            updateGridShapes();
+            pushGridHistory();
+
+            const pdbParam = params.get('pdb');
+            if (pdbParam && /^[a-zA-Z0-9]{4}$/.test(pdbParam)) {
+                $('#rcsb-id').val(pdbParam.toUpperCase());
+                $('#btn-fetch-pdb').trigger('click');
+                if (params.get('mode') === 'ligand') {
+                    window._autoFitFirstLigand = true;
+                }
+            }
+        }
+
+        function loadReceptorData(data, ext, name) {
+            pData = data;
+            pdbName = name;
+            pType = (ext === 'pdbqt') ? 'pdbqt' : (ext === 'cif' || ext === 'mmcif') ? 'cif' : 'pdb';
+            $('#protein-name').text(name);
+
+            if (receptorModel) {
+                viewer.removeModel(receptorModel);
+                receptorModel = null;
+            }
+            viewer.removeAllSurfaces();
+            receptorModel = viewer.addModel(pData, pType);
+            bindClickHandler();
+            detectHetatmLigands();
+            applyReceptorStyle();
+            if ($('#surface-check').is(':checked')) applySurface();
+            updateGridShapes(true);
+            if (window._autoFitFirstLigand) {
+                window._autoFitFirstLigand = false;
+                if ($('#hetatm-select option').length > 0) {
+                    $('#btn-fit-ligand').trigger('click');
+                }
+            }
+            setStatus(`Loaded ${name}`, 'text-emerald-400', 2500);
+        }
+
+        function parseLigandPoses(data, ext) {
+            const poses = [];
+            if (ext === 'sdf') {
+                const blocks = data.split(/\$\$\$\$/).map(b => b.trim()).filter(Boolean);
+                blocks.forEach((b, i) => poses.push({ data: b + '\n$$$$\n', affinity: null, idx: i }));
+            } else if ((ext === 'pdb' || ext === 'pdbqt') && /\bMODEL\b/.test(data)) {
+                const models = data.split(/(?=^MODEL\s+)/m).filter(m => /\b(?:ATOM|HETATM)\b/.test(m));
+                models.forEach((m, i) => {
+                    const match = m.match(/REMARK\s+VINA\s+RESULT:\s*([-\d.]+)/i);
+                    poses.push({ data: m, affinity: match ? parseFloat(match[1]) : null, idx: i });
+                });
+            }
+            if (poses.length === 0) poses.push({ data, affinity: null, idx: 0 });
+            return poses;
+        }
+
+        function renderCurrentPose(shouldFit = false) {
+            if (!ligandPoses.length) return;
+            const pose = ligandPoses[currentPoseIdx];
+            if (ligandModel) {
+                viewer.removeModel(ligandModel);
+                ligandModel = null;
+            }
+            ligandModel = viewer.addModel(pose.data, ligType);
+            ligandModel.setStyle({}, { stick: { colorscheme: 'greenCarbon', radius: 0.22 } });
+            const affText = pose.affinity !== null ? ` | ${pose.affinity.toFixed(1)} kcal/mol` : '';
+            $('#pose-label').text(`Pose ${currentPoseIdx + 1}/${ligandPoses.length}${affText}`);
+            $('#pose-switcher').toggleClass('hidden', ligandPoses.length <= 1);
+            if (shouldFit) {
+                fitBoxToAtoms(ligandModel.selectedAtoms({}), safeNum($('#blind-padding').val(), 5.0), 'ligand');
+            } else {
+                viewer.render();
+            }
+        }
+
+        function loadLigandData(data, ext, name) {
+            ligData = data;
+            ligType = (ext === 'mol2') ? 'mol2' : (ext === 'pdbqt') ? 'pdbqt' : (ext === 'pdb') ? 'pdb' : 'sdf';
+            $('#ligand-name').text(name);
+            ligandPoses = parseLigandPoses(data, ext);
+            currentPoseIdx = 0;
+            renderCurrentPose(true);
+            setStatus(`Ligand: ${name} (${ligandPoses.length} pose${ligandPoses.length > 1 ? 's' : ''})`, 'text-emerald-400', 2500);
+        }
+
+        function detectHetatmLigands() {
+            hetatmGroups = {};
+            if (!receptorModel) return;
+            const exclude = new Set(['HOH', 'WAT', 'DOD', 'NA', 'CL', 'MG', 'ZN', 'CA', 'K', 'SO4', 'PO4', 'GOL', 'EDO']);
+            const hetAtoms = receptorModel.selectedAtoms({ hetflag: true });
+            hetAtoms.forEach(a => {
+                if (!a.resn || exclude.has(a.resn.trim())) return;
+                const key = `${a.resn.trim()}:${a.resi}:${a.chain || '_'}`;
+                if (!hetatmGroups[key]) hetatmGroups[key] = [];
+                hetatmGroups[key].push(a);
+            });
+
+            const keys = Object.keys(hetatmGroups);
+            const sel = $('#hetatm-select').empty();
+            if (keys.length > 0) {
+                keys.forEach(k => {
+                    const [resn, resi, ch] = k.split(':');
+                    const label = `${resn} ${resi}${ch !== '_' ? ' (Chain ' + ch + ')' : ''} [${hetatmGroups[k].length} atoms]`;
+                    sel.append(`<option value="${k}">${label}</option>`);
+                });
+                $('#hetatm-row').removeClass('hidden');
+            } else {
+                $('#hetatm-row').addClass('hidden');
+            }
+        }
+
+        function fitBoxToAtoms(atoms, padding, modeLabel) {
+            if (!atoms || atoms.length === 0) return;
+            let minX = Infinity, minY = Infinity, minZ = Infinity;
+            let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+            atoms.forEach(a => {
+                minX = Math.min(minX, a.x); maxX = Math.max(maxX, a.x);
+                minY = Math.min(minY, a.y); maxY = Math.max(maxY, a.y);
+                minZ = Math.min(minZ, a.z); maxZ = Math.max(maxZ, a.z);
+            });
+            $('#cx').val(((minX + maxX) / 2).toFixed(1));
+            $('#cy').val(((minY + maxY) / 2).toFixed(1));
+            $('#cz').val(((minZ + maxZ) / 2).toFixed(1));
+            $('#sx').val(Math.max(4, (maxX - minX) + padding * 2).toFixed(1));
+            $('#sy').val(Math.max(4, (maxY - minY) + padding * 2).toFixed(1));
+            $('#sz').val(Math.max(4, (maxZ - minZ) + padding * 2).toFixed(1));
+            currentDockingMode = modeLabel;
+            updateGridShapes(true);
+            saveToStorage();
+        }
+
+        function bindClickHandler() {
+            if (!receptorModel) return;
+            receptorModel.setClickable({}, clickSelectActive, function(atom) {
+                if (!clickSelectActive || !atom) return;
+                const key = (atom.chain || '_') + ':' + atom.resi;
+                if (activeTargets.has(key)) activeTargets.delete(key);
+                else activeTargets.add(key);
+
+                // Sync text input
+                const formatted = Array.from(activeTargets).map(t => {
+                    const [c, r] = t.split(':');
+                    return c === '_' ? r : `${r}:${c}`;
+                });
+                $('#target-input').val(formatted.join(', '));
+                recalculateTargetCenter();
+            });
+        }
+
+        function applyReceptorStyle() {
+            if (!receptorModel) return;
+            const baseStyle = $('#repr').val();
+            const colorScheme = $('#color-scheme').val();
+            const outlines = $('#outline-check').is(':checked');
+
+            let colorSpec = {};
+            if (colorScheme === 'okabe') colorSpec = { colorfunc: getOkabeColor };
+            else if (colorScheme === 'gray') colorSpec = { color: '#94a3b8' };
+            else if (colorScheme === 'spectrum') colorSpec = { color: 'spectrum' };
+            else if (colorScheme === 'chain') colorSpec = { colorscheme: 'chain' };
+            else if (colorScheme === 'element') colorSpec = { colorscheme: 'whiteCarbon' };
+            else if (colorScheme === 'hydro') colorSpec = { colorfunc: getHydroColor };
+
+            const styleObj = {};
+            styleObj[baseStyle] = { ...colorSpec, quality: 10, outline: outlines };
+            receptorModel.setStyle({}, styleObj);
+
+            if ($('#hide-waters-check').is(':checked')) {
+                receptorModel.setStyle({ resn: ['HOH', 'WAT', 'DOD', 'NA', 'CL', 'MG', 'ZN', 'CA', 'K', 'SO4', 'PO4', 'GOL', 'EDO'] }, {});
+            }
+
+            if (activeTargets.size > 0) {
+                const targetList = Array.from(activeTargets).map(t => {
+                    const [c, r] = t.split(':');
+                    return { chain: c === '_' ? null : c, resi: parseInt(r, 10) };
+                });
+                const selFn = (atom) => targetList.some(t => atom.resi === t.resi && (t.chain === null || atom.chain === t.chain));
+                const targetAtoms = receptorModel.selectedAtoms(selFn);
+                if (targetAtoms.length > 0) {
+                    const serials = targetAtoms.map(a => a.serial);
+                    receptorModel.setStyle({ serial: serials }, {
+                        ...styleObj,
+                        stick: { colorscheme: 'cyanCarbon', radius: 0.2 }
+                    });
+                }
+            }
+            renderAllLabels();
+            viewer.render();
+        }
+
+        function renderAllLabels() {
+            if (!viewer) return;
+            viewer.removeAllLabels();
+            const bg = $('#bg-mode').val();
+            const isWhite = (bg === 'white');
+
+            if (receptorModel && activeTargets.size > 0 && $('#show-res-labels').is(':checked')) {
+                const targetList = Array.from(activeTargets).map(t => {
+                    const [c, r] = t.split(':');
+                    return { chain: c === '_' ? null : c, resi: parseInt(r, 10) };
+                });
+                const targetAtoms = receptorModel.selectedAtoms(atom =>
+                    targetList.some(t => atom.resi === t.resi && (t.chain === null || atom.chain === t.chain))
+                );
+                const labeled = new Set();
+                targetAtoms.forEach(a => {
+                    const id = `${a.resn}${a.resi}:${a.chain || ''}`;
+                    if (!labeled.has(id) && (a.atom === 'CA' || a.atom === 'C1\'' || !labeled.size)) {
+                        labeled.add(id);
+                        viewer.addLabel(`${a.resn}${a.resi}${a.chain ? ':' + a.chain : ''}`, {
+                            position: { x: a.x, y: a.y, z: a.z },
+                            fontSize: 11,
+                            fontColor: isWhite ? '#0f172a' : '#ffffff',
+                            backgroundColor: isWhite ? 'rgba(255,255,255,0.85)' : 'rgba(9,9,11,0.8)',
+                            borderThickness: 1,
+                            borderColor: '#8b5cf6'
+                        });
+                    }
+                });
+            }
+
+            if ($('#scalebar-check').is(':checked')) {
+                const cx = safeNum($('#cx').val(), 0), cy = safeNum($('#cy').val(), 0), cz = safeNum($('#cz').val(), 0);
+                const sx = Math.max(0.5, safeNum($('#sx').val(), 20)), sy = Math.max(0.5, safeNum($('#sy').val(), 20)), sz = Math.max(0.5, safeNum($('#sz').val(), 20));
+                const x1 = cx - sx / 2, by = cy - sy / 2 - 1.5, z2 = cz + sz / 2;
+                viewer.addLabel("10 Å", {
+                    position: { x: x1 + 5.0, y: by - 0.9, z: z2 },
+                    fontSize: 11,
+                    fontColor: isWhite ? '#0f172a' : '#f8fafc',
+                    backgroundColor: isWhite ? 'rgba(255,255,255,0.8)' : 'rgba(9,9,11,0.75)',
+                    borderThickness: 0
+                });
+            }
+        }
+
+        function applySurface() {
+            if (!viewer) return;
+            viewer.removeAllSurfaces();
+            if (receptorModel && $('#surface-check').is(':checked')) {
+                const opac = safeNum($('#surface-opacity').val(), 0.65);
+                viewer.addSurface($3Dmol.SurfaceType.VDW, {
+                    opacity: opac,
+                    color: $('#bg-mode').val() === 'white' ? '#e2e8f0' : '#f8fafc'
+                }, { model: receptorModel });
+            }
+        }
+
+        function addDashedCylinder(start, end, radius, color, dashLen = 1.0, gapLen = 0.7) {
+            const dx = end.x - start.x, dy = end.y - start.y, dz = end.z - start.z;
+            const total = Math.hypot(dx, dy, dz);
+            if (total === 0) return;
+            const ux = dx / total, uy = dy / total, uz = dz / total;
+            let dist = 0;
+            while (dist < total) {
+                const segEnd = Math.min(dist + dashLen, total);
+                viewer.addCylinder({
+                    start: { x: start.x + ux * dist, y: start.y + uy * dist, z: start.z + uz * dist },
+                    end: { x: start.x + ux * segEnd, y: start.y + uy * segEnd, z: start.z + uz * segEnd },
+                    radius, color, fromCap: true, toCap: true
+                });
+                dist += dashLen + gapLen;
+            }
+        }
+
+        function updateGridShapes(shouldZoom = false) {
+            if (!viewer) return;
+            viewer.removeAllShapes();
+
+            const bg = $('#bg-mode').val();
+            viewer.setBackgroundColor(bg);
+            $('#hud-stats').toggleClass('hud-light', bg === 'white');
+
+            const isOrtho = $('#ortho-check').is(':checked');
+            viewer.setProjection(isOrtho ? "orthographic" : "perspective");
+
+            const cx = safeNum($('#cx').val(), 0), cy = safeNum($('#cy').val(), 0), cz = safeNum($('#cz').val(), 0);
+            const sx = Math.max(0.5, safeNum($('#sx').val(), 20));
+            const sy = Math.max(0.5, safeNum($('#sy').val(), 20));
+            const sz = Math.max(0.5, safeNum($('#sz').val(), 20));
+
+            const tint = $('#grid-color').val();
+            const opac = safeNum($('#grid-opacity').val(), 0.12);
+            const thick = safeNum($('#grid-thickness').val(), 0.30);
+            const boxStyle = $('#box-style').val();
+            const showCross = $('#crosshair-check').is(':checked');
+            const showScale = $('#scalebar-check').is(':checked');
+
+            const x1 = cx - sx / 2, x2 = cx + sx / 2;
+            const y1 = cy - sy / 2, y2 = cy + sy / 2;
+            const z1 = cz - sz / 2, z2 = cz + sz / 2;
+
+            const drawWireBox = (bx1, bx2, by1, by2, bz1, bz2, color, radius, dashed = false) => {
+                const edges = [
+                    [{x:bx1,y:by1,z:bz1},{x:bx2,y:by1,z:bz1}],[{x:bx2,y:by1,z:bz1},{x:bx2,y:by1,z:bz2}],
+                    [{x:bx2,y:by1,z:bz2},{x:bx1,y:by1,z:bz2}],[{x:bx1,y:by1,z:bz2},{x:bx1,y:by1,z:bz1}],
+                    [{x:bx1,y:by2,z:bz1},{x:bx2,y:by2,z:bz1}],[{x:bx2,y:by2,z:bz1},{x:bx2,y:by2,z:bz2}],
+                    [{x:bx2,y:by2,z:bz2},{x:bx1,y:by2,z:bz2}],[{x:bx1,y:by2,z:bz2},{x:bx1,y:by2,z:bz1}],
+                    [{x:bx1,y:by1,z:bz1},{x:bx1,y:by2,z:bz1}],[{x:bx2,y:by1,z:bz1},{x:bx2,y:by2,z:bz1}],
+                    [{x:bx2,y:by1,z:bz2},{x:bx2,y:by2,z:bz2}],[{x:bx1,y:by1,z:bz2},{x:bx1,y:by2,z:bz2}]
+                ];
+                edges.forEach(e => {
+                    if (dashed) addDashedCylinder(e[0], e[1], radius, color);
+                    else viewer.addCylinder({ start: e[0], end: e[1], radius, color, fromCap: true, toCap: true });
+                });
+            };
+
+            if (boxStyle === 'sphere') {
+                const r = Math.max(sx, sy, sz) / 2;
+                viewer.addSphere({ center: { x: cx, y: cy, z: cz }, radius: r, color: tint, opacity: Math.max(0.15, opac), wireframe: false });
+                viewer.addSphere({ center: { x: cx, y: cy, z: cz }, radius: r, color: tint, opacity: 0.7, wireframe: true });
+            } else if (boxStyle === 'dual') {
+                // Outer box + inner Glide-style ligand-centroid box (50% min 10A)
+                if (opac > 0) viewer.addBox({ center: { x: cx, y: cy, z: cz }, dimensions: { w: sx, h: sy, d: sz }, color: '#8b5cf6', opacity: opac });
+                drawWireBox(x1, x2, y1, y2, z1, z2, '#8b5cf6', thick);
+                const ix = Math.max(4, sx * 0.5), iy = Math.max(4, sy * 0.5), iz = Math.max(4, sz * 0.5);
+                drawWireBox(cx - ix/2, cx + ix/2, cy - iy/2, cy + iy/2, cz - iz/2, cz + iz/2, '#10b981', thick * 0.75);
+            } else {
+                if (boxStyle === 'cage' && opac > 0) {
+                    viewer.addBox({ center: { x: cx, y: cy, z: cz }, dimensions: { w: sx, h: sy, d: sz }, color: tint, opacity: opac });
+                }
+                const isDashed = (boxStyle === 'dashed');
+                const edgeR = (boxStyle === 'wireframe') ? Math.min(thick, 0.15) : thick;
+                drawWireBox(x1, x2, y1, y2, z1, z2, tint, edgeR, isDashed);
+                if (boxStyle === 'cage') {
+                    const corners = [
+                        {x:x1,y:y1,z:z1},{x:x2,y:y1,z:z1},{x:x2,y:y2,z:z1},{x:x1,y:y2,z:z1},
+                        {x:x1,y:y1,z:z2},{x:x2,y:y1,z:z2},{x:x2,y:y2,z:z2},{x:x1,y:y2,z:z2}
+                    ];
+                    corners.forEach(c => viewer.addSphere({ center: c, radius: thick * 1.7, color: tint }));
+                }
+            }
+
+            if (showCross) {
+                viewer.addCylinder({ start: { x: x1, y: cy, z: cz }, end: { x: x2, y: cy, z: cz }, radius: thick / 2, color: '#ff4444', opacity: 0.65 });
+                viewer.addCylinder({ start: { x: cx, y: y1, z: cz }, end: { x: cx, y: y2, z: cz }, radius: thick / 2, color: '#44ff44', opacity: 0.65 });
+                viewer.addCylinder({ start: { x: cx, y: cy, z: z1 }, end: { x: cx, y: cy, z: z2 }, radius: thick / 2, color: '#4444ff', opacity: 0.65 });
+                viewer.addSphere({ center: { x: cx, y: cy, z: cz }, radius: thick * 2.0, color: bg === 'white' ? '#0f172a' : '#ffffff', opacity: 0.85 });
+            }
+
+            if (showScale) {
+                const barLen = 10.0;
+                const barColor = bg === 'white' ? '#0f172a' : '#f8fafc';
+                const by = y1 - 1.5;
+                viewer.addCylinder({ start: { x: x1, y: by, z: z2 }, end: { x: x1 + barLen, y: by, z: z2 }, radius: 0.2, color: barColor, fromCap: true, toCap: true });
+            }
+
+            const vol = Math.round(sx * sy * sz);
+            $('#hud-center').text(`${cx.toFixed(1)}, ${cy.toFixed(1)}, ${cz.toFixed(1)}`);
+            $('#hud-dim').text(`${sx.toFixed(1)}, ${sy.toFixed(1)}, ${sz.toFixed(1)}`);
+            $('#hud-vol').text(`${vol.toLocaleString()} Å³`);
+            $('#vol-badge').text(`${vol.toLocaleString()} Å³`);
+
+            // Sanity warnings: Vina >30A focused box & AutoDock 4 npts >126 limit
+            const warnEl = $('#grid-warning');
+            const warnings = [];
+            if ((currentDockingMode === 'specific' || currentDockingMode === 'ligand') && Math.max(sx, sy, sz) > 30) {
+                warnings.push(`Side > 30 Å (${Math.max(sx, sy, sz).toFixed(1)} Å) may reduce Vina search exhaustiveness.`);
+            }
+            const maxNpts = Math.max(sx, sy, sz) / 0.375;
+            if (maxNpts > 126) {
+                warnings.push(`AD4 npts (~${Math.round(maxNpts)}) exceeds AutoGrid's 126-point default limit per axis.`);
+            }
+            if (warnings.length) warnEl.text('Warning: ' + warnings.join(' ')).show();
+            else warnEl.hide();
+
+            renderAllLabels();
+            updateExplanation(cx, cy, cz, sx, sy, sz);
+
+            if (shouldZoom) viewer.zoomTo();
+            viewer.render();
         }
 
         function updateExplanation(cx, cy, cz, sx, sy, sz) {
-            if(!pData) {
-                $('#explain-text').html("Load a protein structure to see geometric context and box rationale.");
+            if (!pData) {
+                $('#explain-text').html("Load a protein structure (local file or RCSB ID) to see geometric context and box rationale.");
                 return;
             }
-
             let html = "";
             if (currentDockingMode === 'blind') {
                 const pad = $('#blind-padding').val();
                 html = `<strong>Blind Docking Protocol</strong><br>
-                        <span class="text-zinc-400">Scope:</span> Whole Protein<br>
-                        <span class="text-zinc-400">Center:</span> Calculated geometric centroid of all atoms.<br>
-                        <span class="text-zinc-400">Boundaries:</span> Protein extents + <span class="text-[#8b5cf6] font-bold">${pad}Å</span> padding.`;
+                        <span class="text-zinc-400">Scope:</span> Whole Receptor<br>
+                        <span class="text-zinc-400">Boundaries:</span> Atom extents + <span class="text-[#8b5cf6] font-bold">${pad} Å</span> padding.`;
+            } else if (currentDockingMode === 'ligand') {
+                html = `<strong>Ligand-Centered Protocol</strong><br>
+                        <span class="text-zinc-400">Center:</span> Bound ligand bounding midpoint.<br>
+                        <span class="text-zinc-400">Size:</span> ${sx.toFixed(1)} × ${sy.toFixed(1)} × ${sz.toFixed(1)} Å`;
             } else if (currentDockingMode === 'specific') {
                 html = `<strong>Site-Specific Protocol</strong><br>`;
-                if(lastTargetDescription) {
+                if (lastTargetDescription) {
                     html += `<span class="text-zinc-400">Target(s):</span> <span class="text-[#8b5cf6] font-bold">${lastTargetDescription}</span><br>`;
-                    html += `<span class="text-zinc-400">Rationale:</span> Grid centered on geometric center of selected residues.`;
+                    html += `<span class="text-zinc-400">Rationale:</span> Centered on selected residues${$('#auto-size-site').is(':checked') ? ' with auto-fitted padding' : ''}.`;
                 } else {
-                    html += `<span class="text-zinc-500 italic">No targets selected. Enter Residue ID to select.</span>`;
+                    html += `<span class="text-zinc-500 italic">No targets selected. Enter Residue ID or use 3D Pick.</span>`;
                 }
             } else {
                 html = `<strong>Manual Configuration</strong><br>
-                        <span class="text-zinc-400">Coordinates:</span> Manually adjusted.<br>
-                        <span class="text-zinc-400">Center:</span> ${cx}, ${cy}, ${cz}`;
+                        <span class="text-zinc-400">Center:</span> ${cx.toFixed(1)}, ${cy.toFixed(1)}, ${cz.toFixed(1)}<br>
+                        <span class="text-zinc-400">Size:</span> ${sx.toFixed(1)} × ${sy.toFixed(1)} × ${sz.toFixed(1)} Å`;
             }
             $('#explain-text').html(html);
         }
 
         function generateConfig(format) {
-            const cx = parseFloat($('#cx').val()).toFixed(3);
-            const cy = parseFloat($('#cy').val()).toFixed(3);
-            const cz = parseFloat($('#cz').val()).toFixed(3);
-            const sx = parseFloat($('#sx').val()).toFixed(3);
-            const sy = parseFloat($('#sy').val()).toFixed(3);
-            const sz = parseFloat($('#sz').val()).toFixed(3);
+            const cx = safeNum($('#cx').val(), 0).toFixed(3);
+            const cy = safeNum($('#cy').val(), 0).toFixed(3);
+            const cz = safeNum($('#cz').val(), 0).toFixed(3);
+            const sx = safeNum($('#sx').val(), 20).toFixed(3);
+            const sy = safeNum($('#sy').val(), 20).toFixed(3);
+            const sz = safeNum($('#sz').val(), 20).toFixed(3);
+            const recBase = (pdbName || 'receptor.pdb').replace(/\.[^/.]+$/, "");
 
             if (format === 'vina') {
-                return `center_x = ${cx}\ncenter_y = ${cy}\ncenter_z = ${cz}\n\nsize_x = ${sx}\nsize_y = ${sy}\nsize_z = ${sz}\n\n# Generated by Gridscope`;
+                return `center_x = ${cx}\ncenter_y = ${cy}\ncenter_z = ${cz}\n\nsize_x = ${sx}\nsize_y = ${sy}\nsize_z = ${sz}\n\n# Generated by Gridscope v1.1`;
             } else if (format === 'ad4') {
                 const spacing = 0.375;
                 const calcPts = (val) => {
-                    let pts = Math.round(val / spacing);
+                    let pts = Math.round(parseFloat(val) / spacing);
                     if (pts % 2 !== 0) pts += 1;
-                    return pts;
+                    return Math.max(2, pts);
                 };
-                const nptsX = calcPts(sx);
-                const nptsY = calcPts(sy);
-                const nptsZ = calcPts(sz);
-                
-                return `# AutoDock 4 GPF Parameters\n# Approx Size: ${sx} x ${sy} x ${sz} A\n\nnpts ${nptsX} ${nptsY} ${nptsZ}\ngridfld rec.maps.fld\nspacing ${spacing}\nreceptor_types A C HD N NA OA SA\nligand_types A C HD N NA OA SA\ngridcenter ${cx} ${cy} ${cz}\nsmooth 0.5\nmap rec.A.map\nmap rec.C.map\nmap rec.HD.map\nmap rec.N.map\nmap rec.NA.map\nmap rec.OA.map\nmap rec.SA.map\nelec rec.e.map\ndsolv rec.d.map\n`;
+                return `# AutoDock 4 GPF Parameters\n# Approx Size: ${sx} x ${sy} x ${sz} A\n\nnpts ${calcPts(sx)} ${calcPts(sy)} ${calcPts(sz)}\ngridfld ${recBase}.maps.fld\nspacing ${spacing}\nreceptor_types A C HD N NA OA SA\nligand_types A C HD N NA OA SA\ngridcenter ${cx} ${cy} ${cz}\nsmooth 0.5\nmap ${recBase}.A.map\nmap ${recBase}.C.map\nmap ${recBase}.HD.map\nmap ${recBase}.N.map\nmap ${recBase}.NA.map\nmap ${recBase}.OA.map\nmap ${recBase}.SA.map\nelec ${recBase}.e.map\ndsolv ${recBase}.d.map\n`;
             } else if (format === 'glide') {
-                return `# Schrödinger Glide Grid\n\nGRID_CENTER   ${cx}, ${cy}, ${cz}\nGRIDBOX_SIZE  ${sx}, ${sy}, ${sz}\nGRIDBOX_AROUND_LIGAND = False\n`;
+                const ix = Math.max(4, Math.round(parseFloat(sx) * 0.5));
+                const iy = Math.max(4, Math.round(parseFloat(sy) * 0.5));
+                const iz = Math.max(4, Math.round(parseFloat(sz) * 0.5));
+                return `# Schrödinger Glide Gridgen Input\nGRIDFILE   ${recBase}_grid.zip\nRECEP_FILE ${recBase}.maegz\nGRID_CENTER ${cx}, ${cy}, ${cz}\nINNERBOX   ${ix}, ${iy}, ${iz}\nOUTERBOX   ${Math.round(parseFloat(sx))}, ${Math.round(parseFloat(sy))}, ${Math.round(parseFloat(sz))}\n`;
+            } else if (format === 'pymol') {
+                const x1 = (parseFloat(cx) - parseFloat(sx)/2).toFixed(3), x2 = (parseFloat(cx) + parseFloat(sx)/2).toFixed(3);
+                const y1 = (parseFloat(cy) - parseFloat(sy)/2).toFixed(3), y2 = (parseFloat(cy) + parseFloat(sy)/2).toFixed(3);
+                const z1 = (parseFloat(cz) - parseFloat(sz)/2).toFixed(3), z2 = (parseFloat(cz) + parseFloat(sz)/2).toFixed(3);
+                const bg = $('#bg-mode').val() === 'white' ? 'white' : 'black';
+                return `# PyMOL Docking Grid Script (Generated by Gridscope)\nload ${pdbName || 'receptor.pdb'}, receptor\nbg_color ${bg}\nshow cartoon, receptor\n\npython\nfrom pymol.cgo import *\nfrom pymol import cmd\nbox = [\n    LINEWIDTH, 2.5,\n    BEGIN, LINES,\n    COLOR, 0.54, 0.36, 0.96,\n    VERTEX, ${x1}, ${y1}, ${z1}, VERTEX, ${x2}, ${y1}, ${z1},\n    VERTEX, ${x2}, ${y1}, ${z1}, VERTEX, ${x2}, ${y1}, ${z2},\n    VERTEX, ${x2}, ${y1}, ${z2}, VERTEX, ${x1}, ${y1}, ${z2},\n    VERTEX, ${x1}, ${y1}, ${z2}, VERTEX, ${x1}, ${y1}, ${z1},\n    VERTEX, ${x1}, ${y2}, ${z1}, VERTEX, ${x2}, ${y2}, ${z1},\n    VERTEX, ${x2}, ${y2}, ${z1}, VERTEX, ${x2}, ${y2}, ${z2},\n    VERTEX, ${x2}, ${y2}, ${z2}, VERTEX, ${x1}, ${y2}, ${z2},\n    VERTEX, ${x1}, ${y2}, ${z2}, VERTEX, ${x1}, ${y2}, ${z1},\n    VERTEX, ${x1}, ${y1}, ${z1}, VERTEX, ${x1}, ${y2}, ${z1},\n    VERTEX, ${x2}, ${y1}, ${z1}, VERTEX, ${x2}, ${y2}, ${z1},\n    VERTEX, ${x2}, ${y1}, ${z2}, VERTEX, ${x2}, ${y2}, ${z2},\n    VERTEX, ${x1}, ${y1}, ${z2}, VERTEX, ${x1}, ${y2}, ${z2},\n    END\n]\ncmd.load_cgo(box, "docking_grid")\npython end\nzoom docking_grid, 5\n`;
+            } else if (format === 'chimerax') {
+                const bg = $('#bg-mode').val() === 'white' ? 'white' : 'black';
+                return `# UCSF ChimeraX Docking Grid Script (Generated by Gridscope)\nopen ${pdbName || 'receptor.pdb'}\nset bgColor ${bg}\ncartoon\nshape box center ${cx},${cy},${cz} size ${sx},${sy},${sz} color #8b5cf6 transparency 75 name docking_grid\nview docking_grid\n`;
+            } else if (format === 'methods') {
+                const vol = Math.round(parseFloat(sx) * parseFloat(sy) * parseFloat(sz));
+                const modeDesc = currentDockingMode === 'blind' ? 'blind docking across the entire receptor'
+                    : currentDockingMode === 'ligand' ? 'ligand-centered docking around the co-crystallized pocket'
+                    : currentDockingMode === 'specific' ? `site-specific docking targeting ${lastTargetDescription || 'selected active-site residues'}`
+                    : 'targeted docking';
+                return `Molecular docking was performed on ${pdbName || 'the receptor structure'} using ${modeDesc}. The three-dimensional search grid was centered at (${cx}, ${cy}, ${cz}) Å with box dimensions of ${sx} × ${sy} × ${sz} Å (total search volume ${vol.toLocaleString()} Å³), configured and validated with Gridscope v1.1.`;
             }
             return "";
         }
 
         function recalculateTargetCenter() {
-            if(activeTargets.size === 0) {
+            if (activeTargets.size === 0 || !receptorModel) {
                 lastTargetDescription = null;
-                updateExplanation($('#cx').val(), $('#cy').val(), $('#cz').val(), $('#sx').val(), $('#sy').val(), $('#sz').val());
-                $('#file-status').text("No targets selected");
+                applyReceptorStyle();
+                updateGridShapes(false);
                 return;
             }
 
-            const m = viewer.getModel(0);
-            
-            const targets = [];
-            activeTargets.forEach(t => {
-                const parts = t.split(':');
-                targets.push({chain: parts[0] === '_' ? null : parts[0], resi: parseInt(parts[1])});
+            const targets = Array.from(activeTargets).map(t => {
+                const [c, r] = t.split(':');
+                return { chain: c === '_' ? null : c, resi: parseInt(r, 10) };
             });
 
-            const atoms = m.selectedAtoms(atom => {
-                for(let t of targets) {
-                    if (atom.resi === t.resi && (t.chain === null || atom.chain === t.chain)) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-
-            if(atoms.length === 0) return;
-
-            let sumX=0, sumY=0, sumZ=0;
-            atoms.forEach(a => { sumX+=a.x; sumY+=a.y; sumZ+=a.z; });
-            
-            const cx = sumX / atoms.length;
-            const cy = sumY / atoms.length;
-            const cz = sumZ / atoms.length;
-
-            $('#cx').val(cx.toFixed(1));
-            $('#cy').val(cy.toFixed(1));
-            $('#cz').val(cz.toFixed(1));
-
-            // Update Description string
-            const uniqueRes = new Set();
-            atoms.forEach(a => {
-                uniqueRes.add(`${a.resn}${a.resi}${a.chain ? ':'+a.chain : ''}`);
-            });
-            
-            const resArray = Array.from(uniqueRes);
-            if(resArray.length <= 4) {
-                lastTargetDescription = resArray.join(", ");
-            } else {
-                lastTargetDescription = `${resArray.slice(0, 3).join(", ")} + ${resArray.length - 3} others`;
+            const atoms = receptorModel.selectedAtoms(atom =>
+                targets.some(t => atom.resi === t.resi && (t.chain === null || atom.chain === t.chain))
+            );
+            if (atoms.length === 0) {
+                setStatus("No matching residues found", "text-red-500", 2000);
+                return;
             }
 
+            let minX = Infinity, minY = Infinity, minZ = Infinity;
+            let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+            let sumX = 0, sumY = 0, sumZ = 0;
+            atoms.forEach(a => {
+                sumX += a.x; sumY += a.y; sumZ += a.z;
+                minX = Math.min(minX, a.x); maxX = Math.max(maxX, a.x);
+                minY = Math.min(minY, a.y); maxY = Math.max(maxY, a.y);
+                minZ = Math.min(minZ, a.z); maxZ = Math.max(maxZ, a.z);
+            });
+
+            $('#cx').val((sumX / atoms.length).toFixed(1));
+            $('#cy').val((sumY / atoms.length).toFixed(1));
+            $('#cz').val((sumZ / atoms.length).toFixed(1));
+
+            if ($('#auto-size-site').is(':checked')) {
+                const pad = safeNum($('#site-padding').val(), 6.0);
+                $('#sx').val(Math.max(8, (maxX - minX) + pad * 2).toFixed(1));
+                $('#sy').val(Math.max(8, (maxY - minY) + pad * 2).toFixed(1));
+                $('#sz').val(Math.max(8, (maxZ - minZ) + pad * 2).toFixed(1));
+            }
+
+            const uniqueRes = new Set();
+            atoms.forEach(a => uniqueRes.add(`${a.resn}${a.resi}${a.chain ? ':' + a.chain : ''}`));
+            const resArray = Array.from(uniqueRes);
+            lastTargetDescription = resArray.length <= 4 ? resArray.join(", ") : `${resArray.slice(0, 3).join(", ")} + ${resArray.length - 3} others`;
+
             currentDockingMode = 'specific';
-            updateVisualization(false);
+            applyReceptorStyle();
+            updateGridShapes(false);
             saveToStorage();
-            
-            $('#file-status').text(`Targets: ${uniqueRes.size}`).addClass('text-[#8b5cf6]');
-            setTimeout(()=>$('#file-status').text("Geometry Engine Active").removeClass('text-[#8b5cf6]'), 2000);
+            setStatus(`Targets: ${uniqueRes.size}`, 'text-[#8b5cf6]', 2000);
+        }
+
+        function pushGridHistory() {
+            if (isRestoringHistory) return;
+            const snap = {
+                cx: $('#cx').val(), cy: $('#cy').val(), cz: $('#cz').val(),
+                sx: $('#sx').val(), sy: $('#sy').val(), sz: $('#sz').val()
+            };
+            const prev = gridHistory[gridHistoryIdx];
+            if (prev && JSON.stringify(prev) === JSON.stringify(snap)) return;
+            gridHistory = gridHistory.slice(0, gridHistoryIdx + 1);
+            gridHistory.push(snap);
+            if (gridHistory.length > 50) gridHistory.shift();
+            gridHistoryIdx = gridHistory.length - 1;
+        }
+
+        function applyGridSnapshot(snap) {
+            if (!snap) return;
+            isRestoringHistory = true;
+            ['cx','cy','cz','sx','sy','sz'].forEach(k => $('#' + k).val(snap[k]));
+            updateGridShapes(false);
+            saveToStorage();
+            isRestoringHistory = false;
+        }
+
+        function undoGrid() {
+            if (gridHistoryIdx > 0) {
+                gridHistoryIdx--;
+                applyGridSnapshot(gridHistory[gridHistoryIdx]);
+                setStatus('Undo Grid', 'text-[#8b5cf6]', 1200);
+            }
+        }
+
+        function redoGrid() {
+            if (gridHistoryIdx < gridHistory.length - 1) {
+                gridHistoryIdx++;
+                applyGridSnapshot(gridHistory[gridHistoryIdx]);
+                setStatus('Redo Grid', 'text-[#8b5cf6]', 1200);
+            }
+        }
+
+        function loadPresetsFromStorage() {
+            try {
+                boxPresets = JSON.parse(localStorage.getItem(PRESETS_KEY) || '{}');
+            } catch (e) { boxPresets = {}; }
+            renderPresetsDropdown();
+        }
+
+        function renderPresetsDropdown() {
+            const keys = Object.keys(boxPresets);
+            const sel = $('#preset-select').empty().append(`<option value="">Saved Boxes (${keys.length})</option>`);
+            keys.forEach(k => sel.append(`<option value="${k}">${k}</option>`));
+        }
+
+        function parseImportedConfig(text) {
+            const getNum = (re) => { const m = text.match(re); return m ? parseFloat(m[1]) : null; };
+            let cx = getNum(/center_x\s*=\s*([-\d.]+)/i);
+            let cy = getNum(/center_y\s*=\s*([-\d.]+)/i);
+            let cz = getNum(/center_z\s*=\s*([-\d.]+)/i);
+            let sx = getNum(/size_x\s*=\s*([-\d.]+)/i);
+            let sy = getNum(/size_y\s*=\s*([-\d.]+)/i);
+            let sz = getNum(/size_z\s*=\s*([-\d.]+)/i);
+
+            // AutoDock 4 GPF fallback
+            if (cx === null) {
+                const gc = text.match(/gridcenter\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/i);
+                if (gc) { cx = parseFloat(gc[1]); cy = parseFloat(gc[2]); cz = parseFloat(gc[3]); }
+                const npts = text.match(/npts\s+(\d+)\s+(\d+)\s+(\d+)/i);
+                const sp = getNum(/spacing\s+([\d.]+)/i) || 0.375;
+                if (npts) { sx = parseInt(npts[1],10)*sp; sy = parseInt(npts[2],10)*sp; sz = parseInt(npts[3],10)*sp; }
+            }
+
+            // Glide fallback
+            if (cx === null) {
+                const gc = text.match(/GRID_CENTER\s+([-\d.]+)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)/i);
+                if (gc) { cx = parseFloat(gc[1]); cy = parseFloat(gc[2]); cz = parseFloat(gc[3]); }
+                const ob = text.match(/OUTERBOX\s+([-\d.]+)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)/i);
+                if (ob) { sx = parseFloat(ob[1]); sy = parseFloat(ob[2]); sz = parseFloat(ob[3]); }
+            }
+
+            if ([cx, cy, cz, sx, sy, sz].some(v => v === null || isNaN(v))) return false;
+            $('#cx').val(cx.toFixed(1)); $('#cy').val(cy.toFixed(1)); $('#cz').val(cz.toFixed(1));
+            $('#sx').val(Math.max(1, sx).toFixed(1)); $('#sy').val(Math.max(1, sy).toFixed(1)); $('#sz').val(Math.max(1, sz).toFixed(1));
+            currentDockingMode = 'manual';
+            pushGridHistory();
+            updateGridShapes(true);
+            saveToStorage();
+            return true;
+        }
+
+        function updateSnapshotPreview() {
+            const preset = $('#snap-width-preset').val();
+            const dpi = parseInt($('#snap-dpi').val(), 10);
+            const vc = document.getElementById('viewport-container');
+            const aspect = vc.clientHeight / Math.max(1, vc.clientWidth);
+            let w, h;
+            if (preset === 'viewport') {
+                w = vc.clientWidth;
+                h = vc.clientHeight;
+            } else {
+                w = Math.round((parseFloat(preset) / 25.4) * dpi);
+                h = Math.round(w * aspect);
+            }
+            $('#snap-dim-preview').text(`Output: ${w} × ${h} px`);
+            return { w, h };
         }
 
         function setupEventListeners() {
@@ -540,15 +1255,9 @@
                 $('#tab-specific').addClass('tab-inactive').removeClass('tab-active');
                 $('#panel-blind').removeClass('hidden');
                 $('#panel-specific').addClass('hidden');
-                
-                $('#target-input').val('');
-                activeTargets.clear();
-                lastTargetDescription = null; 
-                $('#file-status').text("Mode: Blind Docking");
-                
-                currentDockingMode = 'blind'; 
+                currentDockingMode = 'blind';
                 saveToStorage();
-                updateVisualization(false); 
+                updateGridShapes(false);
             });
 
             $('#tab-specific').on('click', () => {
@@ -556,376 +1265,444 @@
                 $('#tab-blind').addClass('tab-inactive').removeClass('tab-active');
                 $('#panel-specific').removeClass('hidden');
                 $('#panel-blind').addClass('hidden');
-                
-                $('#blind-padding').val('5.0');
-                $('#file-status').text("Mode: Site Specific");
-                
                 currentDockingMode = 'specific';
                 saveToStorage();
-                updateVisualization(false);
+                updateGridShapes(false);
             });
 
-            // EXPORT MODAL HANDLERS
+            // PUBLICATION MODE PRESET
+            $('#btn-pub-preset').on('click', () => {
+                $('#bg-mode').val('white');
+                $('#color-scheme').val('okabe');
+                $('#grid-color').val('#334155');
+                $('#box-style').val('dashed');
+                $('#ortho-check').prop('checked', true);
+                $('#crosshair-check').prop('checked', false);
+                $('#scalebar-check').prop('checked', true);
+                $('#outline-check').prop('checked', true);
+                applyReceptorStyle();
+                applySurface();
+                updateGridShapes(false);
+                saveToStorage();
+                setStatus('Publication Mode Applied', 'text-[#8b5cf6]', 2000);
+            });
+
+            // EXPORT MODAL
             $('#btn-open-export').on('click', () => {
                 $('#export-modal').css('display', 'flex');
-                $('.export-tab[data-format="vina"]').trigger('click');
+                $(`.export-tab[data-format="${currentExportFormat}"]`).trigger('click');
             });
             $('#close-export').on('click', () => $('#export-modal').hide());
-            
+
             $('.export-tab').on('click', function() {
                 $('.export-tab').removeClass('tab-active').addClass('tab-inactive');
                 $(this).addClass('tab-active').removeClass('tab-inactive');
                 currentExportFormat = $(this).data('format');
                 $('#config-output').val(generateConfig(currentExportFormat));
-                
-                const labels = { 'vina': 'VINA / GNINA CONF', 'ad4': 'AUTODOCK 4 GPF', 'glide': 'GLIDE IN' };
+                const labels = {
+                    'vina': 'VINA / GNINA CONF', 'ad4': 'AUTODOCK 4 GPF',
+                    'glide': 'GLIDE GRIDGEN IN', 'pymol': 'PYMOL (.PML)',
+                    'chimerax': 'CHIMERAX (.CXC)', 'methods': 'METHODS TEXT'
+                };
                 $('#format-label').text(labels[currentExportFormat]);
             });
 
             $('#copy-config').on('click', () => {
-                const text = $('#config-output').val();
-                navigator.clipboard.writeText(text).then(() => {
-                    const originalText = $('#copy-config').text();
+                navigator.clipboard.writeText($('#config-output').val()).then(() => {
+                    const orig = $('#copy-config').text();
                     $('#copy-config').text("Copied!");
-                    setTimeout(() => $('#copy-config').text(originalText), 1500);
+                    setTimeout(() => $('#copy-config').text(orig), 1500);
                 });
             });
 
             $('#download-config').on('click', () => {
-                const text = $('#config-output').val();
-                const extensions = { 'vina': 'txt', 'ad4': 'gpf', 'glide': 'in' };
-                const blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+                const extensions = { 'vina': 'txt', 'ad4': 'gpf', 'glide': 'in', 'pymol': 'pml', 'chimerax': 'cxc', 'methods': 'txt' };
+                const blob = new Blob([$('#config-output').val()], { type: "text/plain;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
+                link.href = url;
                 link.download = `grid_config.${extensions[currentExportFormat]}`;
                 link.click();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
             });
 
-            $('input, select').on('change input', function() {
-                if(this.id === 'grid-opacity') $('#opacity-val').text(this.value);
-                if(this.id === 'grid-thickness') $('#thickness-val').text(this.value + " Å");
-                if(this.id === 'hud-scale') {
-                    $('#hud-scale-val').text(this.value + "x");
-                    document.documentElement.style.setProperty('--hud-scale', this.value);
-                }
-                if(this.id === 'hud-toggle-check') {
-                    const show = $(this).is(':checked');
-                    $('#hud-stats').toggle(show);
-                    $('#hud-controls').css('opacity', show ? '1' : '0.4').css('pointer-events', show ? 'auto' : 'none');
-                }
-                
-                const zoomMode = (this.id === 'ortho-check');
-                
-                if(['cx','cy','cz','sx','sy','sz'].includes(this.id)) {
-                    currentDockingMode = 'manual';
-                }
-
-                updateVisualization(zoomMode);
-                saveToStorage();
-            });
-
+            // FILE UPLOADS & DRAG-DROP
             $('#pdb-upload').on('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onload = (ev) => {
-                    pData = ev.target.result;
-                    pdbName = file.name;
                     const ext = file.name.split('.').pop().toLowerCase();
-                    pType = (ext === 'pdbqt') ? 'pdbqt' : 'pdb';
-                    $('#protein-name').text(file.name);
-                    updateVisualization(true);
+                    loadReceptorData(ev.target.result, ext, file.name);
                 };
                 reader.readAsText(file);
             });
 
-            $('#btn-blind-dock').on('click', () => {
-                if (!pData) return;
-                currentDockingMode = 'blind';
-                lastTargetDescription = null;
-                activeTargets.clear(); 
-                const lines = pData.split('\n');
-                let minX = Infinity, minY = Infinity, minZ = Infinity;
-                let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
-                let found = false;
+            $('#ligand-upload').on('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    loadLigandData(ev.target.result, ext, file.name);
+                };
+                reader.readAsText(file);
+            });
 
-                lines.forEach(line => {
-                    if (line.startsWith('ATOM') || line.startsWith('HETATM')) {
-                        const x = parseFloat(line.substring(30, 38));
-                        const y = parseFloat(line.substring(38, 46));
-                        const z = parseFloat(line.substring(46, 54));
-                        if (!isNaN(x)) {
-                            minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-                            minY = Math.min(minY, y); maxY = Math.max(maxY, y);
-                            minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
-                            found = true;
-                        }
-                    }
-                });
+            const vc = document.getElementById('viewport-container');
+            vc.addEventListener('dragover', (e) => { e.preventDefault(); vc.classList.add('drag-over'); });
+            vc.addEventListener('dragleave', () => vc.classList.remove('drag-over'));
+            vc.addEventListener('drop', (e) => {
+                e.preventDefault();
+                vc.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (!file) return;
+                const ext = file.name.split('.').pop().toLowerCase();
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    if (['sdf', 'mol2'].includes(ext)) loadLigandData(ev.target.result, ext, file.name);
+                    else loadReceptorData(ev.target.result, ext, file.name);
+                };
+                reader.readAsText(file);
+            });
 
-                if (found) {
-                    const padding = parseFloat($('#blind-padding').val()) || 5.0;
-                    
-                    $('#cx').val(((minX + maxX) / 2).toFixed(1));
-                    $('#cy').val(((minY + maxY) / 2).toFixed(1));
-                    $('#cz').val(((minZ + maxZ) / 2).toFixed(1));
-                    $('#sx').val(((maxX - minX) + (padding * 2)).toFixed(1));
-                    $('#sy').val(((maxY - minY) + (padding * 2)).toFixed(1));
-                    $('#sz').val(((maxZ - minZ) + (padding * 2)).toFixed(1));
-                    updateVisualization(true);
-                    saveToStorage();
+            // RCSB PDB FETCH & SAMPLE 1ATP
+            $('#btn-fetch-pdb').on('click', async () => {
+                const id = $('#rcsb-id').val().trim().toUpperCase();
+                if (!/^[A-Z0-9]{4}$/.test(id)) {
+                    setStatus("Enter 4-char PDB ID", "text-red-500", 2000);
+                    return;
+                }
+                setStatus(`Fetching ${id}...`, "text-[#8b5cf6]");
+                try {
+                    const res = await fetch(`https://files.rcsb.org/download/${id}.pdb`);
+                    if (!res.ok) throw new Error('Not found');
+                    const text = await res.text();
+                    loadReceptorData(text, 'pdb', `${id}.pdb`);
+                } catch (err) {
+                    setStatus(`Failed to fetch ${id}`, "text-red-500", 2500);
                 }
             });
 
-            // TARGET BUTTON Logic
+            $('#btn-sample-1atp').on('click', () => {
+                $('#rcsb-id').val('1ATP');
+                window._autoFitFirstLigand = true;
+                $('#btn-fetch-pdb').trigger('click');
+            });
+
+            // MULTI-POSE NAVIGATION
+            $('#btn-pose-prev').on('click', () => {
+                if (ligandPoses.length <= 1) return;
+                currentPoseIdx = (currentPoseIdx - 1 + ligandPoses.length) % ligandPoses.length;
+                renderCurrentPose(false);
+            });
+            $('#btn-pose-next').on('click', () => {
+                if (ligandPoses.length <= 1) return;
+                currentPoseIdx = (currentPoseIdx + 1) % ligandPoses.length;
+                renderCurrentPose(false);
+            });
+
+            // IMPORT CONFIG MODAL
+            $('#btn-open-import').on('click', () => $('#import-modal').css('display', 'flex'));
+            $('#close-import, #cancel-import').on('click', () => $('#import-modal').hide());
+            $('#apply-import').on('click', () => {
+                if (parseImportedConfig($('#import-input').val())) {
+                    $('#import-modal').hide();
+                    setStatus('Imported Grid Config', 'text-emerald-400', 2000);
+                } else {
+                    setStatus('Could not parse config', 'text-red-500', 2500);
+                }
+            });
+
+            // SHAREABLE URL
+            $('#btn-share-url').on('click', () => {
+                const u = new URL(window.location.href);
+                if (pdbName && /^[A-Z0-9]{4}\.pdb$/i.test(pdbName)) u.searchParams.set('pdb', pdbName.slice(0, 4).toUpperCase());
+                ['cx','cy','cz','sx','sy','sz'].forEach(k => u.searchParams.set(k, $('#' + k).val()));
+                history.replaceState(null, '', u.toString());
+                navigator.clipboard.writeText(u.toString()).then(() => {
+                    setStatus('Share Link Copied!', 'text-emerald-400', 2000);
+                });
+            });
+
+            // MULTI-BOX PRESETS
+            $('#btn-save-preset').on('click', () => {
+                const name = prompt('Preset name (e.g. Orthosteric Site):');
+                if (!name || !name.trim()) return;
+                const clean = name.trim();
+                boxPresets[clean] = {
+                    cx: $('#cx').val(), cy: $('#cy').val(), cz: $('#cz').val(),
+                    sx: $('#sx').val(), sy: $('#sy').val(), sz: $('#sz').val()
+                };
+                localStorage.setItem(PRESETS_KEY, JSON.stringify(boxPresets));
+                renderPresetsDropdown();
+                $('#preset-select').val(clean);
+                setStatus(`Saved "${clean}"`, 'text-[#8b5cf6]', 1500);
+            });
+            $('#preset-select').on('change', function() {
+                const name = $(this).val();
+                if (!name || !boxPresets[name]) return;
+                applyGridSnapshot(boxPresets[name]);
+                pushGridHistory();
+                setStatus(`Loaded "${name}"`, 'text-[#8b5cf6]', 1500);
+            });
+            $('#btn-del-preset').on('click', () => {
+                const name = $('#preset-select').val();
+                if (!name || !boxPresets[name]) return;
+                delete boxPresets[name];
+                localStorage.setItem(PRESETS_KEY, JSON.stringify(boxPresets));
+                renderPresetsDropdown();
+                setStatus(`Deleted "${name}"`, '', 1500);
+            });
+
+            // KEYBOARD SHORTCUTS (CTRL+Z / CTRL+Y / ARROW NUDGE)
+            document.addEventListener('keydown', (e) => {
+                const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+                    e.preventDefault(); undoGrid(); return;
+                }
+                if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+                    e.preventDefault(); redoGrid(); return;
+                }
+                if (['input', 'textarea', 'select'].includes(tag)) return;
+                if (e.key === 'ArrowLeft') { e.preventDefault(); window.stepCoord('cx', -0.5); }
+                else if (e.key === 'ArrowRight') { e.preventDefault(); window.stepCoord('cx', 0.5); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); window.stepCoord('cy', 0.5); }
+                else if (e.key === 'ArrowDown') { e.preventDefault(); window.stepCoord('cy', -0.5); }
+            });
+
+            // FIT HETATM LIGAND
+            $('#btn-fit-ligand').on('click', () => {
+                const key = $('#hetatm-select').val();
+                if (!key || !hetatmGroups[key]) return;
+                fitBoxToAtoms(hetatmGroups[key], safeNum($('#blind-padding').val(), 5.0), 'ligand');
+            });
+
+            // BLIND AUTO-FIT
+            $('#btn-blind-dock').on('click', () => {
+                if (!receptorModel) return;
+                fitBoxToAtoms(receptorModel.selectedAtoms({}), safeNum($('#blind-padding').val(), 5.0), 'blind');
+            });
+
+            // SITE-SPECIFIC TARGETING & 3D PICK
             $('#btn-focus-res').on('click', () => {
-                if(!pData) return;
-                
+                if (!receptorModel) return;
                 const inputVal = $('#target-input').val();
-                if(!inputVal.trim()) return;
-
+                if (!inputVal.trim()) return;
                 activeTargets.clear();
-
-                const parts = inputVal.split(',');
                 let foundAny = false;
-
-                parts.forEach(part => {
+                inputVal.split(',').forEach(part => {
                     part = part.trim();
-                    if(!part) return;
-
-                    let resi, chain;
-                    
-                    if(part.includes(':')) {
-                        const chunks = part.split(':');
-                        if(!isNaN(parseInt(chunks[0]))) {
-                            resi = parseInt(chunks[0]);
-                            chain = chunks[1].toUpperCase();
+                    if (!part) return;
+                    let resi, chain = null;
+                    if (part.includes(':')) {
+                        const chunks = part.split(':').map(s => s.trim());
+                        if (!isNaN(parseInt(chunks[0], 10))) {
+                            resi = parseInt(chunks[0], 10);
+                            chain = chunks[1] ? chunks[1].toUpperCase() : null;
                         } else {
-                            chain = chunks[0].toUpperCase();
-                            resi = parseInt(chunks[1]);
+                            chain = chunks[0] ? chunks[0].toUpperCase() : null;
+                            resi = parseInt(chunks[1], 10);
                         }
                     } else {
-                        resi = parseInt(part);
-                        chain = null;
+                        resi = parseInt(part, 10);
                     }
-
-                    if(!isNaN(resi)) {
-                        activeTargets.add((chain || '_') + ":" + resi);
+                    if (!isNaN(resi)) {
+                        activeTargets.add((chain || '_') + ':' + resi);
                         foundAny = true;
                     }
                 });
-
-                if(foundAny) {
-                    recalculateTargetCenter();
-                } else {
-                    $('#file-status').text("Invalid Input Format").addClass('text-red-500');
-                    setTimeout(()=>$('#file-status').text("Geometry Engine Active").removeClass('text-red-500'), 2000);
-                }
+                if (foundAny) recalculateTargetCenter();
+                else setStatus("Invalid Input Format", "text-red-500", 2000);
             });
 
-            // CLEAR TARGETS
+            $('#btn-click-select').on('click', () => {
+                clickSelectActive = !clickSelectActive;
+                $('#btn-click-select').toggleClass('active-toggle', clickSelectActive);
+                bindClickHandler();
+                setStatus(clickSelectActive ? "3D Pick: Click residues" : "3D Pick Off", "text-[#8b5cf6]", 2000);
+            });
+
             $('#btn-clear-targets').on('click', () => {
                 activeTargets.clear();
-                recalculateTargetCenter();
                 $('#target-input').val('');
-                $('#file-status').text("Targets Cleared");
-                setTimeout(()=>$('#file-status').text("Geometry Engine Active"), 1500);
+                recalculateTargetCenter();
+                setStatus("Targets Cleared", "", 1500);
             });
 
-            $('#align-protein').on('click', () => { 
+            // STYLE / VISUAL INPUTS (CACHED MODEL — NO RE-PARSE!)
+            $('#repr, #color-scheme, #outline-check, #show-res-labels, #hide-waters-check').on('change', () => {
+                applyReceptorStyle();
+                saveToStorage();
+            });
+
+            $('#surface-check, #surface-opacity').on('change input', () => {
+                const show = $('#surface-check').is(':checked');
+                $('#surface-controls').toggleClass('hidden', !show);
+                $('#surface-opac-val').text(parseFloat($('#surface-opacity').val()).toFixed(2));
+                applySurface();
+                saveToStorage();
+            });
+
+            $('#cx, #cy, #cz, #sx, #sy, #sz, #grid-color, #grid-opacity, #grid-thickness, #box-style, #crosshair-check, #scalebar-check, #ortho-check, #bg-mode, #hud-scale, #hud-toggle-check').on('change input', function() {
+                if (this.id === 'grid-opacity') $('#opacity-val').text(this.value);
+                if (this.id === 'grid-thickness') $('#thickness-val').text(parseFloat(this.value).toFixed(2) + " Å");
+                if (this.id === 'hud-scale') {
+                    $('#hud-scale-val').text(this.value + "x");
+                    document.documentElement.style.setProperty('--hud-scale', this.value);
+                }
+                if (this.id === 'hud-toggle-check') {
+                    const show = $(this).is(':checked');
+                    $('#hud-stats').toggle(show);
+                    $('#hud-controls').css('opacity', show ? '1' : '0.4').css('pointer-events', show ? 'auto' : 'none');
+                }
+                if (['cx','cy','cz','sx','sy','sz'].includes(this.id)) {
+                    currentDockingMode = 'manual';
+                    pushGridHistory();
+                }
+                if (this.id === 'bg-mode') applySurface();
+                updateGridShapes(false);
+                saveToStorage();
+            });
+
+            // CAMERA CONTROLS
+            $('#align-protein').on('click', () => {
                 if (!viewer) return;
                 viewer.setView([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
-                viewer.zoomTo(); 
-                viewer.render(); 
+                viewer.zoomTo();
+                viewer.render();
+            });
+
+            $('#zoom-grid').on('click', () => {
+                if (!viewer) return;
+                const cx = safeNum($('#cx').val(), 0), cy = safeNum($('#cy').val(), 0), cz = safeNum($('#cz').val(), 0);
+                const sx = safeNum($('#sx').val(), 20), sy = safeNum($('#sy').val(), 20), sz = safeNum($('#sz').val(), 20);
+                viewer.zoomTo({ x: cx, y: cy, z: cz }, Math.max(sx, sy, sz) * 1.4);
+                viewer.render();
             });
 
             $('#clear-all').on('click', () => $('#wipe-modal').css('display', 'flex'));
             $('#cancel-wipe').on('click', () => $('#wipe-modal').hide());
             $('#confirm-wipe').on('click', () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
-            
+
+            // CLAMPED HUD DRAGGING
             const hud = document.getElementById('hud-stats');
             let isDragging = false, startX, startY, startLeft, startTop;
             hud.addEventListener('mousedown', (e) => {
                 isDragging = true; startX = e.clientX; startY = e.clientY;
                 const rect = hud.getBoundingClientRect();
-                const parentRect = document.getElementById('viewport-container').getBoundingClientRect();
+                const parentRect = vc.getBoundingClientRect();
                 hud.style.left = (rect.left - parentRect.left) + 'px';
                 hud.style.top = (rect.top - parentRect.top) + 'px';
                 hud.style.bottom = 'auto';
-                startLeft = parseInt(hud.style.left);
-                startTop = parseInt(hud.style.top);
+                startLeft = parseInt(hud.style.left, 10);
+                startTop = parseInt(hud.style.top, 10);
                 e.preventDefault();
             });
             document.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
-                hud.style.left = (startLeft + (e.clientX - startX)) + 'px';
-                hud.style.top = (startTop + (e.clientY - startY)) + 'px';
+                const maxL = Math.max(0, vc.clientWidth - hud.offsetWidth);
+                const maxT = Math.max(0, vc.clientHeight - hud.offsetHeight);
+                const nextL = Math.min(maxL, Math.max(0, startLeft + (e.clientX - startX)));
+                const nextT = Math.min(maxT, Math.max(0, startTop + (e.clientY - startY)));
+                hud.style.left = nextL + 'px';
+                hud.style.top = nextT + 'px';
             });
             document.addEventListener('mouseup', () => isDragging = false);
 
             window.stepCoord = (id, amount) => {
                 currentDockingMode = 'manual';
                 const el = document.getElementById(id);
-                const val = parseFloat(el.value) || 0;
-                el.value = (val + amount).toFixed(1);
+                const val = safeNum(el.value, 0);
+                let next = val + amount;
+                if (['sx','sy','sz'].includes(id)) next = Math.max(1.0, next);
+                el.value = next.toFixed(1);
                 $(el).trigger('change');
             };
 
+            // HIGH-DPI SNAPSHOT MODAL & RENDERER
             $('#btn-export-png').on('click', () => {
+                updateSnapshotPreview();
+                $('#snapshot-modal').css('display', 'flex');
+            });
+            $('#close-snapshot, #cancel-snapshot').on('click', () => $('#snapshot-modal').hide());
+            $('#snap-width-preset, #snap-dpi').on('change', updateSnapshotPreview);
+
+            $('#confirm-snapshot').on('click', () => {
                 if (!viewer) return;
+                $('#snapshot-modal').hide();
+                const { w, h } = updateSnapshotPreview();
+                const transparent = $('#snap-transparent').is(':checked');
+                const origBg = $('#bg-mode').val();
+                const origW = vc.style.width, origH = vc.style.height;
 
+                // Temporarily resize viewport container for crisp native WebGL render
+                vc.style.width = w + 'px';
+                vc.style.height = h + 'px';
+                if (transparent) viewer.setBackgroundColor(origBg === 'white' ? 0xffffff : 0x000000, 0);
+                viewer.resize();
+                viewer.render();
+
+                const dataUri = viewer.pngURI();
                 const glCanvas = viewer.getCanvas();
-                const hudElement = document.getElementById('hud-stats');
-                const viewportContainer = document.getElementById('viewport-container');
-                const hudScale = parseFloat($('#hud-scale').val()) || 1.0;
-                const isHudVisible = $('#hud-toggle-check').is(':checked');
-
                 const compositeCanvas = document.createElement('canvas');
                 compositeCanvas.width = glCanvas.width;
                 compositeCanvas.height = glCanvas.height;
                 const ctx = compositeCanvas.getContext('2d');
 
+                const isHudVisible = $('#hud-toggle-check').is(':checked');
+                const hudScale = safeNum($('#hud-scale').val(), 1.0);
+                const hudRect = hud.getBoundingClientRect();
+                const parentRect = vc.getBoundingClientRect();
+
+                // Restore viewport immediately after capturing pngURI
+                vc.style.width = origW;
+                vc.style.height = origH;
+                viewer.setBackgroundColor(origBg, 1);
+                viewer.resize();
+                viewer.render();
+
                 const img = new Image();
                 img.onload = () => {
                     ctx.drawImage(img, 0, 0);
-
                     if (isHudVisible) {
-                        const parentRect = viewportContainer.getBoundingClientRect();
-                        const hudRect = hudElement.getBoundingClientRect();
-
-                        const scaleX = compositeCanvas.width / parentRect.width;
-                        const scaleY = compositeCanvas.height / parentRect.height;
-
+                        const scaleX = compositeCanvas.width / Math.max(1, parentRect.width);
+                        const scaleY = compositeCanvas.height / Math.max(1, parentRect.height);
                         const hudX = (hudRect.left - parentRect.left) * scaleX;
                         const hudY = (hudRect.top - parentRect.top) * scaleY;
                         const hudW = hudRect.width * scaleX;
                         const hudH = hudRect.height * scaleY;
+                        const hudStyle = window.getComputedStyle(hud);
 
-                        const hudStyle = window.getComputedStyle(hudElement);
-
-                        ctx.fillStyle = hudStyle.backgroundColor || "rgba(9, 9, 11, 0.85)";
-                        ctx.beginPath();
-                        const radius = 4 * scaleX;
-                        ctx.moveTo(hudX + radius, hudY);
-                        ctx.lineTo(hudX + hudW - radius, hudY);
-                        ctx.quadraticCurveTo(hudX + hudW, hudY, hudX + hudW, hudY + radius);
-                        ctx.lineTo(hudX + hudW, hudY + hudH - radius);
-                        ctx.quadraticCurveTo(hudX + hudW, hudY + hudH, hudX + hudW - radius, hudY + hudH);
-                        ctx.lineTo(hudX + radius, hudY + hudH);
-                        ctx.quadraticCurveTo(hudX, hudY + hudH, hudX, hudY + hudH - radius);
-                        ctx.lineTo(hudX, hudY + radius);
-                        ctx.quadraticCurveTo(hudX, hudY, hudX + radius, hudY);
-                        ctx.closePath();
-                        ctx.fill();
-
-                        ctx.strokeStyle = hudStyle.borderColor || "#8b5cf6";
+                        ctx.fillStyle = hudStyle.backgroundColor;
+                        ctx.fillRect(hudX, hudY, hudW, hudH);
+                        ctx.strokeStyle = hudStyle.borderColor;
                         ctx.lineWidth = 1 * scaleX;
-                        ctx.stroke();
+                        ctx.strokeRect(hudX, hudY, hudW, hudH);
 
-                        const rows = hudElement.querySelectorAll('.hud-row');
+                        const isLight = hud.classList.contains('hud-light');
                         ctx.textBaseline = 'top';
-                        
-                        rows.forEach((row) => {
+                        hud.querySelectorAll('.hud-row').forEach((row) => {
                             const label = row.querySelector('.hud-label').innerText;
                             const val = row.querySelector('.hud-val').innerText;
                             const rowRect = row.getBoundingClientRect();
                             const rowY = (rowRect.top - parentRect.top) * scaleY;
-                            
-                            ctx.font = `bold ${9 * hudScale * scaleX}px Inter, sans-serif`;
-                            ctx.fillStyle = "#8b5cf6";
+                            ctx.font = `bold ${9 * hudScale * scaleX}px Inter, Arial, sans-serif`;
+                            ctx.fillStyle = isLight ? "#475569" : "#8b5cf6";
                             ctx.fillText(label, hudX + (14 * hudScale * scaleX), rowY);
-
                             ctx.font = `${10 * hudScale * scaleX}px "JetBrains Mono", monospace`;
-                            ctx.fillStyle = "#ffffff";
+                            ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
                             const valWidth = ctx.measureText(val).width;
                             ctx.fillText(val, hudX + hudW - (14 * hudScale * scaleX) - valWidth, rowY);
                         });
                     }
-
                     const link = document.createElement('a');
-                    link.download = `GridScope_Render_${Date.now()}.png`;
+                    link.download = `GridScope_${w}x${h}_${Date.now()}.png`;
                     link.href = compositeCanvas.toDataURL("image/png");
                     link.click();
                 };
-                img.src = viewer.pngURI();
+                img.src = dataUri;
             });
-        }
-
-        function updateVisualization(shouldZoom = false) {
-            if (!viewer) return;
-            viewer.clear();
-            
-            // Re-ordered fog logic
-            viewer.setBackgroundColor($('#bg-mode').val());
-
-            const isOrtho = $('#ortho-check').is(':checked');
-            viewer.setProjection(isOrtho ? "orthographic" : "perspective");
-
-            const baseStyle = $('#repr').val();
-            const colorScheme = $('#color-scheme').val();
-            const outlines = $('#outline-check').is(':checked');
-            
-            let colorSpec = {};
-            if(colorScheme === 'spectrum') colorSpec = {color: 'spectrum'};
-            else if(colorScheme === 'chain') colorSpec = {colorscheme: 'chain'};
-            else if(colorScheme === 'element') colorSpec = {colorscheme: 'whiteCarbon'};
-            else if(colorScheme === 'hydro') colorSpec = {colorfunc: getHydroColor};
-
-            const styleProps = { 
-                ...colorSpec, 
-                quality: 10, 
-                outline: outlines 
-            };
-
-            if (pData) {
-                const m = viewer.addModel(pData, pType); 
-                const styleObj = {};
-                styleObj[baseStyle] = styleProps;
-                m.setStyle({}, styleObj);
-            }
-
-            const cx = parseFloat($('#cx').val()) || 0, cy = parseFloat($('#cy').val()) || 0, cz = parseFloat($('#cz').val()) || 0;
-            const sx = parseFloat($('#sx').val()) || 20, sy = parseFloat($('#sy').val()) || 20, sz = parseFloat($('#sz').val()) || 20;
-            const tint = $('#grid-color').val();
-            const opac = parseFloat($('#grid-opacity').val());
-            const thick = parseFloat($('#grid-thickness').val());
-            const showCross = $('#crosshair-check').is(':checked');
-
-            viewer.addBox({center:{x:cx,y:cy,z:cz}, dimensions:{w:sx,h:sy,d:sz}, color:tint, opacity:opac});
-            
-            const x1 = cx - sx/2, x2 = cx + sx/2;
-            const y1 = cy - sy/2, y2 = cy + sy/2;
-            const z1 = cz - sz/2, z2 = cz + sz/2;
-
-            const edges = [
-                [{x:x1,y:y1,z:z1},{x:x2,y:y1,z:z1}],[{x:x2,y:y1,z:z1},{x:x2,y:y1,z:z2}],[{x:x2,y:y1,z:z2},{x:x1,y:y1,z:z2}],[{x:x1,y:y1,z:z2},{x:x1,y:y1,z:z1}],
-                [{x:x1,y:y2,z:z1},{x:x2,y:y2,z:z1}],[{x:x2,y:y2,z:z1},{x:x2,y:y2,z:z2}],[{x:x2,y:y2,z:z2},{x:x1,y:y2,z:z2}],[{x:x1,y:y2,z:z2},{x:x1,y:y2,z:z1}],
-                [{x:x1,y:y1,z:z1},{x:x1,y:y2,z:z1}],[{x:x2,y:y1,z:z1},{x:x2,y:y2,z:z1}],[{x:x2,y:y1,z:z2},{x:x2,y:y2,z:z2}],[{x:x1,y:y1,z:z2},{x:x1,y:y2,z:z2}]
-            ];
-            edges.forEach(e => {
-                viewer.addCylinder({start:e[0], end:e[1], radius:thick, color:tint, fromCap:true, toCap:true});
-            });
-
-            const corners = [
-                {x:x1,y:y1,z:z1},{x:x2,y:y1,z:z1},{x:x2,y:y2,z:z1},{x:x1,y:y2,z:z1},
-                {x:x1,y:y1,z:z2},{x:x2,y:y1,z:z2},{x:x2,y:y2,z:z2},{x:x1,y:y2,z:z2}
-            ];
-            corners.forEach(c => viewer.addSphere({center:c, radius:thick*1.8, color:tint}));
-
-            if(showCross) {
-                viewer.addCylinder({start:{x:x1,y:cy,z:cz}, end:{x:x2,y:cy,z:cz}, radius:thick/2, color:'#ff4444', opacity: 0.6});
-                viewer.addCylinder({start:{x:cx,y:y1,z:cz}, end:{x:cx,y:y2,z:cz}, radius:thick/2, color:'#44ff44', opacity: 0.6});
-                viewer.addCylinder({start:{x:cx,y:cy,z:z1}, end:{x:cx,y:cy,z:z2}, radius:thick/2, color:'#4444ff', opacity: 0.6});
-                viewer.addSphere({center:{x:cx,y:cy,z:cz}, radius: thick*2.2, color:'#ffffff', opacity: 0.8});
-            }
-            
-            $('#hud-center').text(`${cx.toFixed(1)}, ${cy.toFixed(1)}, ${cz.toFixed(1)}`);
-            $('#hud-dim').text(`${sx.toFixed(1)}, ${sy.toFixed(1)}, ${sz.toFixed(1)}`);
-
-            updateExplanation(cx, cy, cz, sx, sy, sz);
-
-            if (shouldZoom) viewer.zoomTo();
-            viewer.render();
         }
 
         function saveToStorage() {
@@ -933,12 +1710,12 @@
                 cx: $('#cx').val(), cy: $('#cy').val(), cz: $('#cz').val(),
                 sx: $('#sx').val(), sy: $('#sy').val(), sz: $('#sz').val(),
                 tint: $('#grid-color').val(), opac: $('#grid-opacity').val(),
-                thick: $('#grid-thickness').val(), cross: $('#crosshair-check').is(':checked'),
+                thick: $('#grid-thickness').val(), boxStyle: $('#box-style').val(),
+                cross: $('#crosshair-check').is(':checked'), scalebar: $('#scalebar-check').is(':checked'),
                 ortho: $('#ortho-check').is(':checked'), repr: $('#repr').val(),
                 colorScheme: $('#color-scheme').val(), bg: $('#bg-mode').val(),
-                hudScale: $('#hud-scale').val(),
-                hudVisible: $('#hud-toggle-check').is(':checked'),
-                outline: $('#outline-check').is(':checked'),
+                hudScale: $('#hud-scale').val(), hudVisible: $('#hud-toggle-check').is(':checked'),
+                outline: $('#outline-check').is(':checked'), hideWaters: $('#hide-waters-check').is(':checked'),
                 mode: $('#tab-blind').hasClass('tab-active') ? 'blind' : 'specific'
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
@@ -947,39 +1724,43 @@
         function loadFromStorage() {
             const data = localStorage.getItem(STORAGE_KEY);
             if (!data) return;
-            const s = JSON.parse(data);
-            $('#cx').val(s.cx); $('#cy').val(s.cy); $('#cz').val(s.cz);
-            $('#sx').val(s.sx); $('#sy').val(s.sy); $('#sz').val(s.sz);
-            if(s.tint) $('#grid-color').val(s.tint);
-            if(s.opac) { $('#grid-opacity').val(s.opac); $('#opacity-val').text(s.opac); }
-            if(s.thick) { $('#grid-thickness').val(s.thick); $('#thickness-val').text(s.thick + " Å"); }
-            if(s.cross !== undefined) $('#crosshair-check').prop('checked', s.cross);
-            if(s.ortho !== undefined) $('#ortho-check').prop('checked', s.ortho);
-            if(s.repr) $('#repr').val(s.repr);
-            if(s.colorScheme) $('#color-scheme').val(s.colorScheme);
-            if(s.bg) $('#bg-mode').val(s.bg);
-            if(s.hudScale) {
-                $('#hud-scale').val(s.hudScale);
-                $('#hud-scale-val').text(s.hudScale + "x");
-                document.documentElement.style.setProperty('--hud-scale', s.hudScale);
-            }
-            if(s.hudVisible !== undefined) {
-                $('#hud-toggle-check').prop('checked', s.hudVisible);
-                $('#hud-stats').toggle(s.hudVisible);
-                $('#hud-controls').css('opacity', s.hudVisible ? '1' : '0.4').css('pointer-events', s.hudVisible ? 'auto' : 'none');
-            }
-            if(s.outline !== undefined) $('#outline-check').prop('checked', s.outline);
-            
-            // Restore Tab State & Last Mode
-            if(s.mode === 'specific') {
-                $('#tab-specific').trigger('click');
-            } else {
-                $('#tab-blind').trigger('click');
-            }
+            try {
+                const s = JSON.parse(data);
+                if (s.cx !== undefined) $('#cx').val(s.cx);
+                if (s.cy !== undefined) $('#cy').val(s.cy);
+                if (s.cz !== undefined) $('#cz').val(s.cz);
+                if (s.sx !== undefined) $('#sx').val(s.sx);
+                if (s.sy !== undefined) $('#sy').val(s.sy);
+                if (s.sz !== undefined) $('#sz').val(s.sz);
+                if (s.tint) $('#grid-color').val(s.tint);
+                if (s.opac !== undefined) { $('#grid-opacity').val(s.opac); $('#opacity-val').text(s.opac); }
+                if (s.thick !== undefined) { $('#grid-thickness').val(s.thick); $('#thickness-val').text(parseFloat(s.thick).toFixed(2) + " Å"); }
+                if (s.boxStyle) $('#box-style').val(s.boxStyle);
+                if (s.cross !== undefined) $('#crosshair-check').prop('checked', s.cross);
+                if (s.scalebar !== undefined) $('#scalebar-check').prop('checked', s.scalebar);
+                if (s.ortho !== undefined) $('#ortho-check').prop('checked', s.ortho);
+                if (s.repr) $('#repr').val(s.repr);
+                if (s.colorScheme) $('#color-scheme').val(s.colorScheme);
+                if (s.bg) $('#bg-mode').val(s.bg);
+                if (s.hudScale !== undefined) {
+                    $('#hud-scale').val(s.hudScale);
+                    $('#hud-scale-val').text(s.hudScale + "x");
+                    document.documentElement.style.setProperty('--hud-scale', s.hudScale);
+                }
+                if (s.hudVisible !== undefined) {
+                    $('#hud-toggle-check').prop('checked', s.hudVisible);
+                    $('#hud-stats').toggle(s.hudVisible);
+                    $('#hud-controls').css('opacity', s.hudVisible ? '1' : '0.4').css('pointer-events', s.hudVisible ? 'auto' : 'none');
+                }
+                if (s.outline !== undefined) $('#outline-check').prop('checked', s.outline);
+                if (s.hideWaters !== undefined) $('#hide-waters-check').prop('checked', s.hideWaters);
+                if (s.mode === 'specific') $('#tab-specific').trigger('click');
+                else $('#tab-blind').trigger('click');
+            } catch (e) { /* ignore corrupt storage */ }
         }
 
         $(document).ready(initApp);
-        window.addEventListener('resize', () => { if(viewer) viewer.resize(); });
+        window.addEventListener('resize', () => { if (viewer) viewer.resize(); });
     </script>
 </body>
 </html>
