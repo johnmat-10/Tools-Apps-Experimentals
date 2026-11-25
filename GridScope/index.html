@@ -548,6 +548,10 @@
         <main class="flex-1 bg-zinc-950 relative flex items-center justify-center p-6 overflow-hidden">
             <div id="viewport-container" class="w-full h-full relative">
                 <div id="viewport" class="mol-container"></div>
+                <div class="absolute top-3 right-3 z-10 flex items-center gap-2">
+                    <button id="btn-mouse-box" class="px-2.5 py-1 rounded-md bg-slate-950/85 backdrop-blur border border-slate-700 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:border-cyan-400 transition-colors cursor-pointer" title="Toggle direct mouse drag to move/resize box (or hold Shift anytime)">Mouse Box: OFF</button>
+                    <span class="hidden sm:inline-block px-2 py-1 rounded-md bg-slate-950/75 backdrop-blur border border-slate-800 text-[9px] mono text-slate-400 pointer-events-none">Shift+Drag: Move · Shift+Wheel: Resize</span>
+                </div>
                 <div id="hud-stats">
                     <div class="hud-row"><span class="hud-label">CENTER (X,Y,Z)</span><span id="hud-center" class="hud-val">0.0, 0.0, 0.0</span></div>
                     <div class="hud-row"><span class="hud-label">SIZE (X,Y,Z)</span><span id="hud-dim" class="hud-val">20.0, 20.0, 20.0</span></div>
@@ -576,6 +580,9 @@
         let gridHistory = [];
         let gridHistoryIdx = -1;
         let isRestoringHistory = false;
+        let isPubMode = false;
+        let prePubSettings = null;
+        let mouseBoxMode = false;
         let currentExportFormat = 'vina';
         let currentDockingMode = 'blind';
         let lastTargetDescription = null;
@@ -1270,22 +1277,146 @@
                 updateGridShapes(false);
             });
 
-            // PUBLICATION MODE PRESET
+            // PUBLICATION MODE TOGGLE
             $('#btn-pub-preset').on('click', () => {
-                $('#bg-mode').val('white');
-                $('#color-scheme').val('okabe');
-                $('#grid-color').val('#334155');
-                $('#box-style').val('dashed');
-                $('#ortho-check').prop('checked', true);
-                $('#crosshair-check').prop('checked', false);
-                $('#scalebar-check').prop('checked', true);
-                $('#outline-check').prop('checked', true);
+                if (!isPubMode) {
+                    prePubSettings = {
+                        bg: $('#bg-mode').val(),
+                        colorScheme: $('#color-scheme').val(),
+                        tint: $('#grid-color').val(),
+                        boxStyle: $('#box-style').val(),
+                        ortho: $('#ortho-check').is(':checked'),
+                        cross: $('#crosshair-check').is(':checked'),
+                        scalebar: $('#scalebar-check').is(':checked'),
+                        outline: $('#outline-check').is(':checked')
+                    };
+                    $('#bg-mode').val('white');
+                    $('#color-scheme').val('okabe');
+                    $('#grid-color').val('#334155');
+                    $('#box-style').val('dashed');
+                    $('#ortho-check').prop('checked', true);
+                    $('#crosshair-check').prop('checked', false);
+                    $('#scalebar-check').prop('checked', true);
+                    $('#outline-check').prop('checked', true);
+                    isPubMode = true;
+                    $('#btn-pub-preset').text('Exit Pub Mode').addClass('bg-cyan-500/20 border-cyan-400 text-cyan-300');
+                    setStatus('Publication Mode ON', 'text-cyan-400', 2000);
+                } else {
+                    const prev = prePubSettings || {
+                        bg: 'black', colorScheme: 'okabe', tint: '#06b6d4',
+                        boxStyle: 'cage', ortho: false, cross: false, scalebar: false, outline: true
+                    };
+                    $('#bg-mode').val(prev.bg);
+                    $('#color-scheme').val(prev.colorScheme);
+                    $('#grid-color').val(prev.tint);
+                    $('#box-style').val(prev.boxStyle);
+                    $('#ortho-check').prop('checked', prev.ortho);
+                    $('#crosshair-check').prop('checked', prev.cross);
+                    $('#scalebar-check').prop('checked', prev.scalebar);
+                    $('#outline-check').prop('checked', prev.outline);
+                    isPubMode = false;
+                    $('#btn-pub-preset').text('Publication Mode').removeClass('bg-cyan-500/20 border-cyan-400 text-cyan-300');
+                    setStatus('Studio Mode Restored', 'text-emerald-400', 2000);
+                }
                 applyReceptorStyle();
                 applySurface();
                 updateGridShapes(false);
                 saveToStorage();
-                setStatus('Publication Mode Applied', 'text-[#8b5cf6]', 2000);
             });
+
+            // MOUSE BOX MOVE / RESIZE CONTROLS
+            $('#btn-mouse-box').on('click', () => {
+                mouseBoxMode = !mouseBoxMode;
+                $('#btn-mouse-box')
+                    .text(mouseBoxMode ? 'Mouse Box: ON' : 'Mouse Box: OFF')
+                    .toggleClass('border-cyan-400 text-cyan-300 bg-cyan-500/20', mouseBoxMode);
+                $('#viewport').css('cursor', mouseBoxMode ? 'move' : 'default');
+                setStatus(mouseBoxMode ? 'Drag to move box · Right-drag/Wheel to resize' : 'Camera Controls Active', 'text-cyan-400', 2200);
+            });
+
+            const vpEl = document.getElementById('viewport');
+            let boxDragState = null;
+
+            function getCameraBasis() {
+                if (!viewer || typeof viewer.getView !== 'function') return { rx: 1, ry: 0, rz: 0, ux: 0, uy: 1, uz: 0 };
+                const v = viewer.getView();
+                if (!v || v.length < 8) return { rx: 1, ry: 0, rz: 0, ux: 0, uy: 1, uz: 0 };
+                // Conjugate of view quaternion maps camera-local axes to world coordinates
+                const qx = -v[4], qy = -v[5], qz = -v[6], qw = v[7];
+                const rot = (vx, vy, vz) => {
+                    const ix = qw * vx + qy * vz - qz * vy;
+                    const iy = qw * vy + qz * vx - qx * vz;
+                    const iz = qw * vz + qx * vy - qy * vx;
+                    const iw = -qx * vx - qy * vy - qz * vz;
+                    return {
+                        x: ix * qw + iw * -qx + iy * -qz - iz * -qy,
+                        y: iy * qw + iw * -qy + iz * -qx - ix * -qz,
+                        z: iz * qw + iw * -qz + ix * -qy - iy * -qx
+                    };
+                };
+                const r = rot(1, 0, 0), u = rot(0, 1, 0);
+                return { rx: r.x, ry: r.y, rz: r.z, ux: u.x, uy: u.y, uz: u.z };
+            }
+
+            vpEl.addEventListener('mousedown', (e) => {
+                if (!mouseBoxMode && !e.shiftKey) return;
+                if (e.target && e.target.closest('#hud-stats')) return;
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                const isResize = (e.button === 2 || e.altKey);
+                boxDragState = {
+                    x: e.clientX, y: e.clientY, isResize,
+                    cx: safeNum($('#cx').val(), 0), cy: safeNum($('#cy').val(), 0), cz: safeNum($('#cz').val(), 0),
+                    sx: safeNum($('#sx').val(), 20), sy: safeNum($('#sy').val(), 20), sz: safeNum($('#sz').val(), 20),
+                    basis: getCameraBasis()
+                };
+            }, true);
+
+            vpEl.addEventListener('contextmenu', (e) => { if (mouseBoxMode || e.shiftKey) e.preventDefault(); });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!boxDragState) return;
+                const dx = e.clientX - boxDragState.x;
+                const dy = e.clientY - boxDragState.y;
+                if (boxDragState.isResize) {
+                    const delta = (dx - dy) * 0.08;
+                    $('#sx').val(Math.max(1, boxDragState.sx + delta).toFixed(1));
+                    $('#sy').val(Math.max(1, boxDragState.sy + delta).toFixed(1));
+                    $('#sz').val(Math.max(1, boxDragState.sz + delta).toFixed(1));
+                } else {
+                    const sens = 0.07;
+                    const b = boxDragState.basis;
+                    const ncx = boxDragState.cx + (dx * b.rx - dy * b.ux) * sens;
+                    const ncy = boxDragState.cy + (dx * b.ry - dy * b.uy) * sens;
+                    const ncz = boxDragState.cz + (dx * b.rz - dy * b.uz) * sens;
+                    $('#cx').val(ncx.toFixed(1));
+                    $('#cy').val(ncy.toFixed(1));
+                    $('#cz').val(ncz.toFixed(1));
+                }
+                currentDockingMode = 'manual';
+                updateGridShapes(false);
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (!boxDragState) return;
+                boxDragState = null;
+                pushGridHistory();
+                saveToStorage();
+            });
+
+            vpEl.addEventListener('wheel', (e) => {
+                if (!mouseBoxMode && !e.shiftKey) return;
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 1.0 : -1.0;
+                $('#sx').val(Math.max(1, safeNum($('#sx').val(), 20) + delta).toFixed(1));
+                $('#sy').val(Math.max(1, safeNum($('#sy').val(), 20) + delta).toFixed(1));
+                $('#sz').val(Math.max(1, safeNum($('#sz').val(), 20) + delta).toFixed(1));
+                currentDockingMode = 'manual';
+                pushGridHistory();
+                updateGridShapes(false);
+                saveToStorage();
+            }, { capture: true, passive: false });
 
             // EXPORT MODAL
             $('#btn-open-export').on('click', () => {
