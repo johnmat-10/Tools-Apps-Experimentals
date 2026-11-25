@@ -43,3 +43,7 @@ Live App: **https://johnmat-10.github.io/Tools-Apps-Experimentals/GridScope/**
 - **PyMOL (`.pml`), ChimeraX (`.cxc`) & Methods Export**: Export ready-to-run figure scripts and copy-ready manuscript *Methods* text.
 - **Keyboard Shortcuts & Shareable URLs**: `Ctrl+Z` / `Ctrl+Y` undo/redo, arrow-key box nudging, and `Share Link` URL state encoding.
 - **Design Overhaul**: Precision Cyan / Obsidian Slate palette, isometric cube + node SVG logo, and **Plus Jakarta Sans** + **IBM Plex Mono** typography.
+
+---
+
+*Built with assistance from Gemini in Antigravity.*
