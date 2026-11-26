@@ -233,9 +233,30 @@
         </div>
     </div>
 
+    <!-- Shortcuts & Controls Modal -->
+    <div id="shortcuts-modal" class="overlay-base">
+        <div id="export-content" style="width:420px">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-white font-bold text-sm uppercase tracking-wide">Controls &amp; Shortcuts</h3>
+                <button id="close-shortcuts" class="text-slate-500 hover:text-white transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="space-y-2 text-left text-[11px] mono">
+                <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-cyan-400">Shift + Left-Drag</span><span class="text-slate-300">Move Box Center</span></div>
+                <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-cyan-400">Shift + Wheel / Alt+Drag</span><span class="text-slate-300">Resize Box (All / X / Y / Z)</span></div>
+                <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-cyan-400">Mouse Box: ON</span><span class="text-slate-300">Drag = Move · Right-Drag = Resize</span></div>
+                <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-cyan-400">Arrow Keys</span><span class="text-slate-300">Nudge Center X / Y (0.5 Å)</span></div>
+                <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-cyan-400">Ctrl+Z / Ctrl+Y</span><span class="text-slate-300">Undo / Redo Grid Edits</span></div>
+                <div class="flex justify-between py-1"><span class="text-cyan-400">3D Pick</span><span class="text-slate-300">Click Residues to Target</span></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <nav class="h-12 bg-[#090d14] border-b border-[#1f2937] flex items-center px-6 justify-between z-30 shadow-2xl">
-        <div class="flex items-center gap-5">
+        <div class="flex items-center gap-3">
+            <button id="btn-toggle-sidebar" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-300 cursor-pointer" title="Toggle Sidebar">☰</button>
             <div class="flex items-center gap-2.5">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">
                     <path d="M12 2.5L20.5 7.4V16.6L12 21.5L3.5 16.6V7.4L12 2.5Z" stroke="#06b6d4" stroke-width="1.8" stroke-linejoin="round"/>
@@ -247,15 +268,16 @@
             <div class="h-4 w-[1px] bg-slate-800"></div>
             <div id="file-status" class="text-slate-400 font-medium text-[10px] uppercase tracking-[0.18em]">Geometry Engine Active</div>
         </div>
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2">
             <button id="btn-share-url" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-md text-[9px] text-slate-300 uppercase font-bold tracking-wider transition-colors cursor-pointer" title="Copy shareable link with current PDB and grid coordinates">Share Link</button>
             <button id="btn-pub-preset" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-md text-[9px] text-slate-200 uppercase font-bold tracking-wider transition-colors cursor-pointer" title="Switch to white background, colorblind-safe palette, and clean cage">Publication Mode</button>
+            <button id="btn-open-shortcuts" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-md text-[10px] text-cyan-300 font-bold cursor-pointer" title="Keyboard & Mouse Shortcuts">?</button>
             <div class="px-2 py-0.5 bg-cyan-950/80 border border-cyan-500/40 rounded-md text-[9px] text-cyan-300 mono tracking-tight uppercase font-bold">v1.1</div>
         </div>
     </nav>
 
     <div class="flex flex-1 overflow-hidden">
-        <aside class="sidebar flex flex-col overflow-y-auto p-5 custom-scrollbar">
+        <aside id="sidebar-panel" class="sidebar flex flex-col overflow-y-auto p-5 custom-scrollbar transition-all duration-200">
             
             <div class="section-label"><span>Structure Engine</span><span class="text-[8px] text-zinc-600 font-normal normal-case">Drag &amp; drop supported</span></div>
             <div class="control-group space-y-2.5">
@@ -270,11 +292,12 @@
                     </div>
                 </label>
 
-                <!-- RCSB PDB Fetch + Sample -->
+                <!-- RCSB PDB Fetch + Sample + Apo Pocket -->
                 <div class="flex gap-1.5">
                     <input type="text" id="rcsb-id" maxlength="4" placeholder="RCSB ID (e.g. 1ATP)" class="input-field mono uppercase text-[11px] py-1.5">
                     <button id="btn-fetch-pdb" class="btn-secondary px-2.5 text-[10px] uppercase font-bold whitespace-nowrap">Fetch</button>
-                    <button id="btn-sample-1atp" class="btn-secondary px-2 text-[9px] uppercase font-bold text-[#c4b5fd] border-[#8b5cf6]/40 hover:border-[#8b5cf6] whitespace-nowrap" title="Load sample complex 1ATP">1ATP</button>
+                    <button id="btn-sample-1atp" class="btn-secondary px-2 text-[9px] uppercase font-bold text-cyan-300 border-cyan-500/40 hover:border-cyan-400 whitespace-nowrap" title="Load sample complex 1ATP">1ATP</button>
+                    <button id="btn-find-pocket" class="btn-secondary px-2 text-[9px] uppercase font-bold text-emerald-300 border-emerald-500/40 hover:border-emerald-400 whitespace-nowrap" title="Detect likely binding cavity on apo structures">Pocket</button>
                 </div>
 
                 <!-- Optional Ligand Upload & Co-crystal Detection -->
@@ -293,6 +316,12 @@
                         <button id="btn-pose-prev" class="btn-step px-2">◀</button>
                         <span id="pose-label" class="text-[10px] mono text-emerald-400 truncate">Pose 1/1</span>
                         <button id="btn-pose-next" class="btn-step px-2">▶</button>
+                    </div>
+                    <div id="contacts-row" class="hidden flex items-center justify-between px-1 text-[9px] text-slate-300">
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="contacts-check" checked class="w-3.5 h-3.5 accent-cyan-400">
+                            <span>Show Pocket Contacts (4 Å) &amp; H-Bonds</span>
+                        </label>
                     </div>
                     <div id="hetatm-row" class="hidden flex gap-1.5 items-center">
                         <select id="hetatm-select" class="input-field custom-select text-[10px] py-1 flex-1"></select>
@@ -451,6 +480,7 @@
                         <label class="text-[9px] text-zinc-500 uppercase font-extrabold">Coloring</label>
                         <select id="color-scheme" class="input-field custom-select py-1.5">
                             <option value="okabe" selected>Colorblind-Safe</option>
+                            <option value="plddt">AlphaFold pLDDT</option>
                             <option value="gray">Uniform Slate</option>
                             <option value="chain">Chain ID</option>
                             <option value="hydro">Hydrophobicity</option>
@@ -550,7 +580,13 @@
                 <div id="viewport" class="mol-container"></div>
                 <div class="absolute top-3 right-3 z-10 flex items-center gap-2">
                     <button id="btn-mouse-box" class="px-2.5 py-1 rounded-md bg-slate-950/85 backdrop-blur border border-slate-700 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:border-cyan-400 transition-colors cursor-pointer" title="Toggle direct mouse drag to move/resize box (or hold Shift anytime)">Mouse Box: OFF</button>
-                    <span class="hidden sm:inline-block px-2 py-1 rounded-md bg-slate-950/75 backdrop-blur border border-slate-800 text-[9px] mono text-slate-400 pointer-events-none">Shift+Drag: Move · Shift+Wheel: Resize</span>
+                    <select id="resize-axis" class="px-2 py-1 rounded-md bg-slate-950/85 backdrop-blur border border-slate-700 text-[10px] font-bold uppercase text-cyan-300 outline-none cursor-pointer" title="Axis to resize on Shift+Wheel or Right-Drag">
+                        <option value="all" selected>Resize: All</option>
+                        <option value="sx">Resize: X</option>
+                        <option value="sy">Resize: Y</option>
+                        <option value="sz">Resize: Z</option>
+                    </select>
+                    <span class="hidden md:inline-block px-2 py-1 rounded-md bg-slate-950/75 backdrop-blur border border-slate-800 text-[9px] mono text-slate-400 pointer-events-none">Shift+Drag: Move · Shift+Wheel: Resize</span>
                 </div>
                 <div id="hud-stats">
                     <div class="hud-row"><span class="hud-label">CENTER (X,Y,Z)</span><span id="hud-center" class="hud-val">0.0, 0.0, 0.0</span></div>
@@ -603,6 +639,14 @@
 
         function getHydroColor(atom) {
             return (atom.resn && hydrophobicityMap[atom.resn]) ? hydrophobicityMap[atom.resn] : '#cccccc';
+        }
+
+        function getPlddtColor(atom) {
+            const b = atom.b || 0;
+            if (b >= 90) return '#0053d6';
+            if (b >= 70) return '#65cbf3';
+            if (b >= 50) return '#ffdb13';
+            return '#ff7d45';
         }
 
         function getOkabeColor(atom) {
@@ -717,10 +761,12 @@
             const affText = pose.affinity !== null ? ` | ${pose.affinity.toFixed(1)} kcal/mol` : '';
             $('#pose-label').text(`Pose ${currentPoseIdx + 1}/${ligandPoses.length}${affText}`);
             $('#pose-switcher').toggleClass('hidden', ligandPoses.length <= 1);
+            $('#contacts-row').removeClass('hidden');
+            applyReceptorStyle();
             if (shouldFit) {
                 fitBoxToAtoms(ligandModel.selectedAtoms({}), safeNum($('#blind-padding').val(), 5.0), 'ligand');
             } else {
-                viewer.render();
+                updateGridShapes(false);
             }
         }
 
@@ -806,6 +852,7 @@
 
             let colorSpec = {};
             if (colorScheme === 'okabe') colorSpec = { colorfunc: getOkabeColor };
+            else if (colorScheme === 'plddt') colorSpec = { colorfunc: getPlddtColor };
             else if (colorScheme === 'gray') colorSpec = { color: '#94a3b8' };
             else if (colorScheme === 'spectrum') colorSpec = { color: 'spectrum' };
             else if (colorScheme === 'chain') colorSpec = { colorscheme: 'chain' };
@@ -818,6 +865,25 @@
 
             if ($('#hide-waters-check').is(':checked')) {
                 receptorModel.setStyle({ resn: ['HOH', 'WAT', 'DOD', 'NA', 'CL', 'MG', 'ZN', 'CA', 'K', 'SO4', 'PO4', 'GOL', 'EDO'] }, {});
+            }
+
+            if (ligandModel && $('#contacts-check').is(':checked')) {
+                const ligAtoms = ligandModel.selectedAtoms({});
+                const recAtoms = receptorModel.selectedAtoms({ hetflag: false });
+                const contactRes = new Set();
+                recAtoms.forEach(ra => {
+                    for (const la of ligAtoms) {
+                        const d2 = (ra.x - la.x)**2 + (ra.y - la.y)**2 + (ra.z - la.z)**2;
+                        if (d2 <= 16.0) { contactRes.add(`${ra.resi}:${ra.chain || '_'}`); break; }
+                    }
+                });
+                if (contactRes.size > 0) {
+                    const contactAtoms = recAtoms.filter(a => contactRes.has(`${a.resi}:${a.chain || '_'}`));
+                    receptorModel.setStyle({ serial: contactAtoms.map(a => a.serial) }, {
+                        ...styleObj,
+                        stick: { colorscheme: 'default', radius: 0.16 }
+                    });
+                }
             }
 
             if (activeTargets.size > 0) {
@@ -993,6 +1059,19 @@
                 const barColor = bg === 'white' ? '#0f172a' : '#f8fafc';
                 const by = y1 - 1.5;
                 viewer.addCylinder({ start: { x: x1, y: by, z: z2 }, end: { x: x1 + barLen, y: by, z: z2 }, radius: 0.2, color: barColor, fromCap: true, toCap: true });
+            }
+
+            if (receptorModel && ligandModel && $('#contacts-check').is(':checked')) {
+                const ligPolar = ligandModel.selectedAtoms({ elem: ['N', 'O'] });
+                const recPolar = receptorModel.selectedAtoms({ hetflag: false, elem: ['N', 'O'] });
+                recPolar.forEach(ra => {
+                    ligPolar.forEach(la => {
+                        const d = Math.hypot(ra.x - la.x, ra.y - la.y, ra.z - la.z);
+                        if (d >= 2.2 && d <= 3.5) {
+                            addDashedCylinder({ x: ra.x, y: ra.y, z: ra.z }, { x: la.x, y: la.y, z: la.z }, 0.08, '#f59e0b', 0.45, 0.35);
+                        }
+                    });
+                });
             }
 
             const vol = Math.round(sx * sy * sz);
@@ -1380,9 +1459,10 @@
                 const dy = e.clientY - boxDragState.y;
                 if (boxDragState.isResize) {
                     const delta = (dx - dy) * 0.08;
-                    $('#sx').val(Math.max(1, boxDragState.sx + delta).toFixed(1));
-                    $('#sy').val(Math.max(1, boxDragState.sy + delta).toFixed(1));
-                    $('#sz').val(Math.max(1, boxDragState.sz + delta).toFixed(1));
+                    const axis = $('#resize-axis').val();
+                    if (axis === 'all' || axis === 'sx') $('#sx').val(Math.max(1, boxDragState.sx + delta).toFixed(1));
+                    if (axis === 'all' || axis === 'sy') $('#sy').val(Math.max(1, boxDragState.sy + delta).toFixed(1));
+                    if (axis === 'all' || axis === 'sz') $('#sz').val(Math.max(1, boxDragState.sz + delta).toFixed(1));
                 } else {
                     const sens = 0.07;
                     const b = boxDragState.basis;
@@ -1409,9 +1489,10 @@
                 e.stopImmediatePropagation();
                 e.preventDefault();
                 const delta = e.deltaY < 0 ? 1.0 : -1.0;
-                $('#sx').val(Math.max(1, safeNum($('#sx').val(), 20) + delta).toFixed(1));
-                $('#sy').val(Math.max(1, safeNum($('#sy').val(), 20) + delta).toFixed(1));
-                $('#sz').val(Math.max(1, safeNum($('#sz').val(), 20) + delta).toFixed(1));
+                const axis = $('#resize-axis').val();
+                if (axis === 'all' || axis === 'sx') $('#sx').val(Math.max(1, safeNum($('#sx').val(), 20) + delta).toFixed(1));
+                if (axis === 'all' || axis === 'sy') $('#sy').val(Math.max(1, safeNum($('#sy').val(), 20) + delta).toFixed(1));
+                if (axis === 'all' || axis === 'sz') $('#sz').val(Math.max(1, safeNum($('#sz').val(), 20) + delta).toFixed(1));
                 currentDockingMode = 'manual';
                 pushGridHistory();
                 updateGridShapes(false);
@@ -1520,6 +1601,58 @@
                 window._autoFitFirstLigand = true;
                 $('#btn-fetch-pdb').trigger('click');
             });
+
+            // APO POCKET FINDER
+            $('#btn-find-pocket').on('click', () => {
+                if (!receptorModel) { setStatus('Load a receptor first', 'text-red-500', 2000); return; }
+                const atoms = receptorModel.selectedAtoms({ hetflag: false });
+                if (atoms.length < 20) return;
+                // Subsample polymer atoms for fast client-side cavity scoring
+                const stride = Math.max(1, Math.floor(atoms.length / 450));
+                const pts = [];
+                let minX = Infinity, minY = Infinity, minZ = Infinity, maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+                for (let i = 0; i < atoms.length; i += stride) {
+                    const a = atoms[i]; pts.push(a);
+                    minX = Math.min(minX, a.x); maxX = Math.max(maxX, a.x);
+                    minY = Math.min(minY, a.y); maxY = Math.max(maxY, a.y);
+                    minZ = Math.min(minZ, a.z); maxZ = Math.max(maxZ, a.z);
+                }
+                const step = Math.max(2.5, Math.min(4.0, Math.max(maxX - minX, maxY - minY, maxZ - minZ) / 16));
+                let best = null;
+                for (let x = minX + 2; x <= maxX - 2; x += step) {
+                    for (let y = minY + 2; y <= maxY - 2; y += step) {
+                        for (let z = minZ + 2; z <= maxZ - 2; z += step) {
+                            let minD2 = Infinity, neighbors = 0;
+                            for (const a of pts) {
+                                const d2 = (x - a.x)**2 + (y - a.y)**2 + (z - a.z)**2;
+                                if (d2 < minD2) minD2 = d2;
+                                if (d2 <= 81) neighbors++;
+                            }
+                            if (minD2 >= 9.0 && minD2 <= 42.25 && neighbors > 6) {
+                                if (!best || neighbors > best.score) best = { x, y, z, score: neighbors };
+                            }
+                        }
+                    }
+                }
+                if (!best) { setStatus('No deep cavity found', 'text-amber-400', 2000); return; }
+                $('#cx').val(best.x.toFixed(1)); $('#cy').val(best.y.toFixed(1)); $('#cz').val(best.z.toFixed(1));
+                $('#sx').val('20.0'); $('#sy').val('20.0'); $('#sz').val('20.0');
+                currentDockingMode = 'manual';
+                pushGridHistory();
+                updateGridShapes(false);
+                viewer.zoomTo({ x: best.x, y: best.y, z: best.z }, 28);
+                saveToStorage();
+                setStatus('Pocket Centered!', 'text-emerald-400', 2000);
+            });
+
+            // SHORTCUTS MODAL, SIDEBAR TOGGLE & CONTACTS TOGGLE
+            $('#btn-open-shortcuts').on('click', () => $('#shortcuts-modal').css('display', 'flex'));
+            $('#close-shortcuts').on('click', () => $('#shortcuts-modal').hide());
+            $('#btn-toggle-sidebar').on('click', () => {
+                $('#sidebar-panel').toggleClass('hidden');
+                setTimeout(() => { if (viewer) { viewer.resize(); viewer.render(); } }, 50);
+            });
+            $('#contacts-check').on('change', () => { applyReceptorStyle(); updateGridShapes(false); });
 
             // MULTI-POSE NAVIGATION
             $('#btn-pose-prev').on('click', () => {
